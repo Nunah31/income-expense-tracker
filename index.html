@@ -28,20 +28,19 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .btn-add-main:hover { background: #dcfce7; }
 
 /* ---- SUMMARY BAR ---- */
-.summary { max-width: 700px; margin: 12px auto 0; padding: 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.summary-card { background: white; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
-.summary-card .label { font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-.summary-card .amount { font-size: 20px; font-weight: 700; }
+.summary { max-width: 700px; margin: 10px auto 0; padding: 0 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
+.summary-card { background: white; border-radius: 12px; padding: 10px 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
+.summary-card .label { font-size: 13px; color: #374151; margin-bottom: 4px; font-weight: 700; }
+.summary-card .amount { font-size: 16px; font-weight: 700; }
 .card-income .amount { color: #16a34a; }
 .card-expense .amount { color: #dc2626; }
-.card-balance { grid-column: span 2; background: linear-gradient(135deg, #1e3a5f, #1d4ed8); }
-.card-balance .label { color: rgba(255,255,255,0.8); }
-.card-balance .amount { color: white; font-size: 26px; }
+.card-balance { background: linear-gradient(135deg, #1e3a5f, #1d4ed8); }
+.card-balance .label { color: rgba(255,255,255,0.9); }
+.card-balance .amount { color: white; font-size: 16px; }
 .card-bank { cursor: pointer; border: 2px dashed #d1d5db; }
 .card-bank:hover { border-color: #6366f1; }
-.card-bank .amount { color: #6366f1; }
-.card-bank input { width: 100%; border: none; text-align: center; font-size: 20px; font-weight: 700; color: #6366f1; font-family: inherit; outline: none; background: transparent; }
-.card-bank .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
+.card-bank input { width: 100%; border: none; text-align: center; font-size: 16px; font-weight: 700; color: #6366f1; font-family: inherit; outline: none; background: transparent; }
+.card-bank .hint { font-size: 12px; color: #6b7280; margin-top: 2px; font-weight: 600; }
 
 /* ---- TABS ---- */
 .main { max-width: 700px; margin: 0 auto; padding: 12px 12px 80px; }
@@ -71,7 +70,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .entry-meta { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
 .entry-date { font-size: 13px; color: #6b7280; }
 .entry-date span { color: #374151; font-weight: 500; }
-.entry-notes { font-size: 13px; color: #9ca3af; margin-top: 4px; font-style: italic; }
+.entry-notes { font-size: 15px; color: #111827; margin-top: 6px; font-style: normal; font-weight: 500; }
 .entry-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
 .badge-paid { background: #dcfce7; color: #15803d; }
