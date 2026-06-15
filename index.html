@@ -28,13 +28,20 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .btn-add-main:hover { background: #dcfce7; }
 
 /* ---- SUMMARY BAR ---- */
-.summary { max-width: 700px; margin: 12px auto 0; padding: 0 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.summary { max-width: 700px; margin: 12px auto 0; padding: 0 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .summary-card { background: white; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
 .summary-card .label { font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
 .summary-card .amount { font-size: 20px; font-weight: 700; }
 .card-income .amount { color: #16a34a; }
 .card-expense .amount { color: #dc2626; }
-.card-balance .amount { color: #1d4ed8; }
+.card-balance { grid-column: span 2; background: linear-gradient(135deg, #1e3a5f, #1d4ed8); }
+.card-balance .label { color: rgba(255,255,255,0.8); }
+.card-balance .amount { color: white; font-size: 26px; }
+.card-bank { cursor: pointer; border: 2px dashed #d1d5db; }
+.card-bank:hover { border-color: #6366f1; }
+.card-bank .amount { color: #6366f1; }
+.card-bank input { width: 100%; border: none; text-align: center; font-size: 20px; font-weight: 700; color: #6366f1; font-family: inherit; outline: none; background: transparent; }
+.card-bank .hint { font-size: 11px; color: #9ca3af; margin-top: 2px; }
 
 /* ---- TABS ---- */
 .main { max-width: 700px; margin: 0 auto; padding: 12px 12px 80px; }
@@ -165,13 +172,18 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     <div class="label">הכנסות</div>
     <div class="amount" id="totalIncome">₪0</div>
   </div>
-  <div class="summary-card card-balance">
-    <div class="label">יתרה</div>
-    <div class="amount" id="totalBalance">₪0</div>
-  </div>
   <div class="summary-card card-expense">
     <div class="label">הוצאות</div>
     <div class="amount" id="totalExpense">₪0</div>
+  </div>
+  <div class="summary-card card-bank" onclick="focusBank()">
+    <div class="label">מצב בנק</div>
+    <input type="number" id="bankBalance" placeholder="0" oninput="updateSummary()" onblur="saveBankBalance()">
+    <div class="hint">לחצי לעריכה</div>
+  </div>
+  <div class="summary-card card-balance">
+    <div class="label">יתרה כוללת</div>
+    <div class="amount" id="totalBalance">₪0</div>
   </div>
 </div>
 
@@ -264,6 +276,7 @@ let editingType = 'income';
 // ---- INIT ----
 function startApp() {
   loadFromStorage();
+  loadBankBalance();
   populateMonthFilter();
   renderList();
   updateSummary();
@@ -391,16 +404,29 @@ function formatAmount(a) {
   return '₪' + Number(a).toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 }
 
+// ---- BANK BALANCE ----
+function focusBank() {
+  const inp = document.getElementById('bankBalance');
+  inp.focus();
+  inp.select();
+}
+function saveBankBalance() {
+  localStorage.setItem('bankBalance', document.getElementById('bankBalance').value);
+}
+function loadBankBalance() {
+  const saved = localStorage.getItem('bankBalance');
+  if (saved) document.getElementById('bankBalance').value = saved;
+}
+
 // ---- SUMMARY ----
 function updateSummary() {
   const income = entries.filter(e => e.type === 'income').reduce((s, e) => s + (Number(e.amount) || 0), 0);
   const expense = entries.filter(e => e.type === 'expense').reduce((s, e) => s + (Number(e.amount) || 0), 0);
   document.getElementById('totalIncome').textContent = formatAmount(income);
   document.getElementById('totalExpense').textContent = formatAmount(expense);
-  const bal = income - expense;
-  const balEl = document.getElementById('totalBalance');
-  balEl.textContent = formatAmount(bal);
-  balEl.style.color = bal >= 0 ? '#1d4ed8' : '#dc2626';
+  const bank = parseFloat(document.getElementById('bankBalance').value) || 0;
+  const bal = bank + income - expense;
+  document.getElementById('totalBalance').textContent = formatAmount(bal);
 }
 
 // ---- MODAL ----
