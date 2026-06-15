@@ -5,17 +5,17 @@
 const SHEET_NAME = 'זכות';
 
 function doGet(e) {
+  const cb = e.parameter.callback || null;
   try {
     if (e.parameter && e.parameter.data) {
       const entries = JSON.parse(e.parameter.data);
       syncSheet(entries);
-      return buildResponse({ success: true, count: entries.length });
+      return buildResponse({ success: true, count: entries.length }, cb);
     }
-    // קריאת נתונים
     const data = readSheet();
-    return buildResponse({ success: true, data });
+    return buildResponse({ success: true, data }, cb);
   } catch (err) {
-    return buildResponse({ success: false, error: err.message });
+    return buildResponse({ success: false, error: err.message }, cb);
   }
 }
 
@@ -140,8 +140,14 @@ function statusKey(label) {
   return map[label] || 'unpaid';
 }
 
-function buildResponse(data) {
+function buildResponse(data, callback) {
+  const json = JSON.stringify(data);
+  if (callback) {
+    return ContentService
+      .createTextOutput(callback + '(' + json + ')')
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
+  }
   return ContentService
-    .createTextOutput(JSON.stringify(data))
+    .createTextOutput(json)
     .setMimeType(ContentService.MimeType.JSON);
 }
