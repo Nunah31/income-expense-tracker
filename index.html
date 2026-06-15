@@ -268,7 +268,7 @@ function startApp() {
   renderList();
   updateSummary();
   updateHeaderSub();
-  if (entries.length === 0 && SHEETS_SCRIPT_URL) loadFromSheets();
+  if (entries.length === 0 && SHEETS_SCRIPT_URL) loadFromSheets(true);
 }
 
 function init() {
@@ -539,8 +539,11 @@ function jsonp(url) {
 }
 
 // ---- LOAD FROM SHEETS ----
-async function loadFromSheets() {
+async function loadFromSheets(silent) {
   if (!SHEETS_SCRIPT_URL) return;
+  if (!silent && entries.length > 0) {
+    if (!confirm('טעינה מהשיטס תחליף את כל הנתונים המקומיים.\nהאם לשמור קודם לשיטס?')) return;
+  }
   showStatus('🔄 טוען מגוגל שיטס...', '');
   try {
     const json = await jsonp(SHEETS_SCRIPT_URL);
