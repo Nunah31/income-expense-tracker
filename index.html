@@ -426,7 +426,7 @@ function loadBankBalance() {
 function formatBankAmount(n) {
   if (!n && n !== 0) return '0 ₪';
   const abs = Math.abs(n).toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
-  return (n < 0 ? '-' : '') + abs + ' ₪';
+  return abs + (n < 0 ? '- ₪' : ' ₪');
 }
 
 // ---- SUMMARY ----
