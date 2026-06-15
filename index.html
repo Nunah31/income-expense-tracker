@@ -659,31 +659,22 @@ async function loadFromSheets(silent) {
   }
 }
 
-// ---- SYNC TO SHEETS (iframe form trick — עוקף CORS) ----
-function syncToSheets(silent) {
+// ---- SYNC TO SHEETS ----
+async function syncToSheets(silent) {
   if (!SHEETS_SCRIPT_URL) return;
   try {
-    let iframe = document.getElementById('sync-iframe');
-    if (!iframe) {
-      iframe = document.createElement('iframe');
-      iframe.id = 'sync-iframe';
-      iframe.name = 'sync-iframe';
-      iframe.style.display = 'none';
-      document.body.appendChild(iframe);
+    const payload = JSON.stringify(entries);
+    const url = SHEETS_SCRIPT_URL
+      + '?key=' + encodeURIComponent(SECRET_KEY)
+      + '&data=' + encodeURIComponent(payload);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (json.success) {
+      showStatus('✅ נשמר לשיטס', 'success');
+    } else {
+      showStatus('❌ שיטס: ' + (json.error || 'שגיאה'), 'error');
     }
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = SHEETS_SCRIPT_URL + '?key=' + encodeURIComponent(SECRET_KEY);
-    form.target = 'sync-iframe';
-    form.style.display = 'none';
-    const field = document.createElement('textarea');
-    field.name = 'data';
-    field.value = JSON.stringify(entries);
-    form.appendChild(field);
-    document.body.appendChild(form);
-    form.submit();
-    form.remove();
-    showStatus('✅ נשמר לשיטס', 'success');
   } catch(err) {
     showStatus('❌ שיטס: ' + err.message, 'error');
   }
