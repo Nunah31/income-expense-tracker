@@ -696,7 +696,8 @@ function showStatus(msg, type) {
   el.textContent = msg;
   el.className = 'sync-status show ' + type;
   clearTimeout(el._timer);
-  el._timer = setTimeout(() => { el.classList.remove('show'); }, 3000);
+  const duration = type === 'error' ? 10000 : 3000; // שגיאות — 10 שניות
+  el._timer = setTimeout(() => { el.classList.remove('show'); }, duration);
 }
 
 // ---- SERVICE WORKER ----
