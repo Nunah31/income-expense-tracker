@@ -11,13 +11,15 @@ function doGet(e) {
     return buildResponse({ success: false, error: 'unauthorized' }, cb);
   }
   try {
-    if (e.parameter && e.parameter.data) {
+    const action = e.parameter.action || '';
+    if (action === 'write' && e.parameter.data) {
       const entries = JSON.parse(e.parameter.data);
       syncSheet(entries);
       return buildResponse({ success: true, count: entries.length }, cb);
     }
+    // ברירת מחדל: קריאה
     const data = readSheet();
-    return buildResponse({ success: true, data }, cb);
+    return buildResponse({ success: true, data: data }, cb);
   } catch (err) {
     return buildResponse({ success: false, error: err.message }, cb);
   }

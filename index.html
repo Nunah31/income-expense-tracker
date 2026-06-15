@@ -665,15 +665,19 @@ async function syncToSheets(silent) {
   try {
     const payload = JSON.stringify(entries);
     const url = SHEETS_SCRIPT_URL
-      + '?key=' + encodeURIComponent(SECRET_KEY)
+      + '?action=write'
+      + '&key=' + encodeURIComponent(SECRET_KEY)
       + '&data=' + encodeURIComponent(payload);
     const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
-    if (json.success) {
-      showStatus('✅ נשמר לשיטס', 'success');
+    if (json.success && json.count !== undefined) {
+      showStatus('✅ נשמרו ' + json.count + ' רשומות לשיטס', 'success');
+    } else if (json.error) {
+      showStatus('❌ שיטס: ' + json.error, 'error');
     } else {
-      showStatus('❌ שיטס: ' + (json.error || 'שגיאה'), 'error');
+      // קיבלנו success אבל בלי count — הנתונים לא נשמרו
+      showStatus('⚠️ הנתונים לא הגיעו לשיטס (URL ארוך מדי?)', 'error');
     }
   } catch(err) {
     showStatus('❌ שיטס: ' + err.message, 'error');
