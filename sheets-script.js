@@ -24,23 +24,23 @@ function doGet(e) {
 }
 
 function doPost(e) {
-  const cb = null;
   if (e.parameter && e.parameter.key !== SECRET_KEY) {
-    return buildResponse({ success: false, error: 'unauthorized' }, cb);
+    return buildResponse({ success: false, error: 'unauthorized' });
   }
   try {
     let entries;
-    if (e.postData && e.postData.contents) {
-      entries = JSON.parse(e.postData.contents);
-    } else if (e.parameter && e.parameter.data) {
+    // טופס נסתר שולח data כ-form parameter
+    if (e.parameter && e.parameter.data) {
       entries = JSON.parse(e.parameter.data);
+    } else if (e.postData && e.postData.contents) {
+      entries = JSON.parse(e.postData.contents);
     } else {
-      return buildResponse({ success: false, error: 'no data' }, cb);
+      return buildResponse({ success: false, error: 'no data' });
     }
     syncSheet(entries);
-    return buildResponse({ success: true, count: entries.length }, cb);
+    return buildResponse({ success: true, count: entries.length });
   } catch (err) {
-    return buildResponse({ success: false, error: err.message }, cb);
+    return buildResponse({ success: false, error: err.message });
   }
 }
 
