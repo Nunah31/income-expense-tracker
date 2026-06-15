@@ -68,8 +68,8 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .entry-card.income .entry-amount { color: #16a34a; }
 .entry-card.expense .entry-amount { color: #dc2626; }
 .entry-meta { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
-.entry-date { font-size: 13px; color: #6b7280; }
-.entry-date span { color: #374151; font-weight: 500; }
+.entry-date { font-size: 13px; color: #111827; font-weight: 500; }
+.entry-date span { color: #111827; font-weight: 700; }
 .entry-notes { font-size: 15px; color: #111827; margin-top: 6px; font-style: normal; font-weight: 500; }
 .entry-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
 .badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
@@ -377,11 +377,11 @@ function renderList() {
     return;
   }
 
-  // הוצאות — מיון לפי פרעון; שאר — לפי ביצוע
+  // הוצאות — מיון לפי פרעון מהישן לחדש; שאר — לפי ביצוע מהחדש לישן
   const sorted = [...filtered].sort((a, b) => {
     const da = (currentTab === 'expense' ? a.payDate || a.execDate : a.execDate || a.payDate) || '';
     const db = (currentTab === 'expense' ? b.payDate || b.execDate : b.execDate || b.payDate) || '';
-    return db.localeCompare(da);
+    return currentTab === 'expense' ? da.localeCompare(db) : db.localeCompare(da);
   });
 
   list.innerHTML = sorted.map(e => {
