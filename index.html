@@ -467,20 +467,32 @@ async function loadFromSheets() {
   if (!SHEETS_SCRIPT_URL) return;
   showStatus('🔄 טוען מגוגל שיטס...', '');
   try {
-    const res = await fetch(SHEETS_SCRIPT_URL);
-    const json = await res.json();
+    const res = await fetch(SHEETS_SCRIPT_URL, { redirect: 'follow' });
+    const text = await res.text();
+    let json;
+    try {
+      json = JSON.parse(text);
+    } catch(e) {
+      console.error('Apps Script response:', text);
+      showStatus('❌ תגובה לא תקינה מ-Apps Script', 'error');
+      return;
+    }
     if (json.success && Array.isArray(json.data) && json.data.length > 0) {
       entries = json.data;
       saveToStorage();
       populateMonthFilter();
       renderList();
       updateSummary();
-      showStatus('✅ נטען מגוגל שיטס!', 'success');
+      showStatus('✅ נטען ' + json.data.length + ' רשומות מגוגל שיטס!', 'success');
+    } else if (json.error) {
+      console.error('Apps Script error:', json.error);
+      showStatus('❌ שגיאה: ' + json.error, 'error');
     } else {
-      showStatus('אין נתונים בשיטס', '');
+      showStatus('השיטס ריק — הוסיפי רשומות ושמרי', '');
     }
   } catch(err) {
-    showStatus('❌ שגיאה בטעינה: ' + err.message, 'error');
+    console.error('Fetch error:', err);
+    showStatus('❌ שגיאת רשת: ' + err.message, 'error');
   }
 }
 
