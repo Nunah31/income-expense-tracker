@@ -319,6 +319,13 @@ function loadFromStorage() {
 
 function saveToStorage() {
   localStorage.setItem('finance_entries', JSON.stringify(entries));
+  scheduleSyncToSheets();
+}
+
+let syncTimer = null;
+function scheduleSyncToSheets() {
+  clearTimeout(syncTimer);
+  syncTimer = setTimeout(() => syncToSheets(true), 2000); // שמור 2 שניות אחרי השינוי האחרון
 }
 
 function updateHeaderSub() {
@@ -667,19 +674,19 @@ async function loadFromSheets(silent) {
 }
 
 // ---- SYNC TO SHEETS ----
-async function syncToSheets() {
-  if (!SHEETS_SCRIPT_URL) { alert('⚠️ כתובת ה-Apps Script אינה מוגדרת.'); return; }
-  showStatus('🔄 שומר לגוגל שיטס...', '');
+async function syncToSheets(silent) {
+  if (!SHEETS_SCRIPT_URL) { if (!silent) alert('⚠️ כתובת ה-Apps Script אינה מוגדרת.'); return; }
+  if (!silent) showStatus('🔄 שומר לגוגל שיטס...', '');
   try {
     const payload = JSON.stringify(entries);
     const json = await jsonp(SHEETS_SCRIPT_URL + '?data=' + encodeURIComponent(payload));
     if (json.success) {
-      showStatus('✅ נשמר לגוגל שיטס!', 'success');
+      showStatus('✅ נשמר אוטומטית', 'success');
     } else {
-      showStatus('❌ ' + (json.error || 'שגיאה'), 'error');
+      if (!silent) showStatus('❌ ' + (json.error || 'שגיאה'), 'error');
     }
   } catch(err) {
-    showStatus('❌ ' + err.message, 'error');
+    if (!silent) showStatus('❌ ' + err.message, 'error');
   }
 }
 
