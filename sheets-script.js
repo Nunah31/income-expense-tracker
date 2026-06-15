@@ -54,7 +54,7 @@ function syncSheet(entries) {
   sheet.getRange('A3').setValue('הכנסות').setFontWeight('bold').setFontSize(13);
   sheet.getRange('H3').setValue('הוצאות').setFontWeight('bold').setFontSize(13);
 
-  const headers = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'סטטוס', 'הערות'];
+  const headers = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'הערות', 'סטטוס'];
   // הכנסות - עמודות A-F
   headers.forEach((h, i) => sheet.getRange(4, i + 1).setValue(h).setFontWeight('bold'));
   // הוצאות - עמודות H-M
@@ -68,8 +68,8 @@ function syncSheet(entries) {
       sheet.getRange(row, 2).setValue(e.execDate ? new Date(e.execDate) : '');
       sheet.getRange(row, 3).setValue(e.payDate ? new Date(e.payDate) : '');
       sheet.getRange(row, 4).setValue(e.amount || 0);
-      sheet.getRange(row, 5).setValue(statusLabel(e.status));
-      sheet.getRange(row, 6).setValue(e.notes || '');
+      sheet.getRange(row, 5).setValue(e.notes || '');
+      sheet.getRange(row, 6).setValue(statusLabel(e.status));
     }
     if (expense[i]) {
       const e = expense[i];
@@ -77,8 +77,8 @@ function syncSheet(entries) {
       sheet.getRange(row, 9).setValue(e.execDate ? new Date(e.execDate) : '');
       sheet.getRange(row, 10).setValue(e.payDate ? new Date(e.payDate) : '');
       sheet.getRange(row, 11).setValue(e.amount || 0);
-      sheet.getRange(row, 12).setValue(statusLabel(e.status));
-      sheet.getRange(row, 13).setValue(e.notes || '');
+      sheet.getRange(row, 12).setValue(e.notes || '');
+      sheet.getRange(row, 13).setValue(statusLabel(e.status));
     }
   }
 
@@ -113,8 +113,8 @@ function readSheet() {
         execDate: row[1] ? Utilities.formatDate(new Date(row[1]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
         payDate: row[2] ? Utilities.formatDate(new Date(row[2]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
         amount: row[3] || 0,
-        status: statusKey(row[4]),
-        notes: row[5] || '',
+        notes: row[4] || '',
+        status: statusKey(row[5]),
       });
     }
     if (row[7]) {
@@ -125,8 +125,8 @@ function readSheet() {
         execDate: row[8] ? Utilities.formatDate(new Date(row[8]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
         payDate: row[9] ? Utilities.formatDate(new Date(row[9]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
         amount: row[10] || 0,
-        status: statusKey(row[11]),
-        notes: row[12] || '',
+        notes: row[11] || '',
+        status: statusKey(row[12]),
       });
     }
   });
