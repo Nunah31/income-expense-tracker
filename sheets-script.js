@@ -3,7 +3,7 @@
 // גיליון: זכות
 
 const SHEET_NAME = 'זכות';
-const SECRET_KEY = 'habari25'; // ← חייב להיות זהה לקוד באפליקציה
+const SECRET_KEY = 'esther-udi-2025';
 
 function doGet(e) {
   const cb = e.parameter.callback || null;
