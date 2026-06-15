@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#16a34a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="הכנסות והוצאות">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>הכנסות והוצאות</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0fdf4; min-height: 100vh; direction: rtl; font-size: 16px; }
+
+/* ---- HEADER ---- */
+.header { background: linear-gradient(135deg, #14532d 0%, #16a34a 100%); padding: 18px 16px 14px; color: white; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+.header-inner { max-width: 700px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.header-left { display: flex; flex-direction: column; }
+.header h1 { font-size: 22px; font-weight: 700; }
+.header-sub { font-size: 13px; opacity: 0.8; margin-top: 2px; }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.btn-sync { background: rgba(255,255,255,0.2); color: white; border: 1px solid rgba(255,255,255,0.5); border-radius: 10px; padding: 9px 14px; font-weight: 600; font-size: 14px; cursor: pointer; font-family: inherit; }
+.btn-sync:hover { background: rgba(255,255,255,0.3); }
+.btn-add-main { background: white; color: #14532d; border: none; border-radius: 10px; padding: 9px 16px; font-weight: 700; font-size: 14px; cursor: pointer; font-family: inherit; }
+.btn-add-main:hover { background: #dcfce7; }
+
+/* ---- SUMMARY BAR ---- */
+.summary { max-width: 700px; margin: 12px auto 0; padding: 0 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.summary-card { background: white; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
+.summary-card .label { font-size: 12px; color: #6b7280; margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.summary-card .amount { font-size: 20px; font-weight: 700; }
+.card-income .amount { color: #16a34a; }
+.card-expense .amount { color: #dc2626; }
+.card-balance .amount { color: #1d4ed8; }
+
+/* ---- TABS ---- */
+.main { max-width: 700px; margin: 0 auto; padding: 12px 12px 80px; }
+.tabs { display: flex; gap: 6px; margin-bottom: 14px; background: white; border-radius: 14px; padding: 6px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); }
+.tab { flex: 1; padding: 10px; border: none; border-radius: 10px; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.15s; background: transparent; color: #6b7280; }
+.tab.active.income-tab { background: #16a34a; color: white; }
+.tab.active.expense-tab { background: #dc2626; color: white; }
+.tab:not(.active):hover { background: #f3f4f6; color: #374151; }
+
+/* ---- FILTER BAR ---- */
+.filter-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
+.filter-bar select, .filter-bar input[type="text"] { border: 1.5px solid #d1fae5; border-radius: 10px; padding: 8px 12px; font-family: inherit; font-size: 14px; background: white; color: #111827; flex: 1; min-width: 100px; }
+.filter-bar select:focus, .filter-bar input:focus { outline: none; border-color: #16a34a; }
+
+/* ---- ENTRIES LIST ---- */
+.entries { display: flex; flex-direction: column; gap: 10px; }
+.entry-card { background: white; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-right: 4px solid transparent; cursor: pointer; transition: box-shadow 0.15s; }
+.entry-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.12); }
+.entry-card.income { border-right-color: #16a34a; }
+.entry-card.expense { border-right-color: #dc2626; }
+.entry-card.unpaid { opacity: 0.7; }
+.entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.entry-name { font-size: 16px; font-weight: 700; color: #111827; }
+.entry-amount { font-size: 18px; font-weight: 700; white-space: nowrap; }
+.entry-card.income .entry-amount { color: #16a34a; }
+.entry-card.expense .entry-amount { color: #dc2626; }
+.entry-meta { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
+.entry-date { font-size: 13px; color: #6b7280; }
+.entry-date span { color: #374151; font-weight: 500; }
+.entry-notes { font-size: 13px; color: #9ca3af; margin-top: 4px; font-style: italic; }
+.entry-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+.badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
+.badge-paid { background: #dcfce7; color: #15803d; }
+.badge-unpaid { background: #fee2e2; color: #dc2626; }
+.badge-partial { background: #fef3c7; color: #b45309; }
+
+.empty-state { text-align: center; padding: 40px 20px; color: #9ca3af; }
+.empty-state .icon { font-size: 48px; margin-bottom: 12px; }
+.empty-state p { font-size: 16px; }
+
+/* ---- MODAL ---- */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; align-items: flex-end; justify-content: center; }
+.modal-overlay.open { display: flex; }
+.modal { background: white; border-radius: 20px 20px 0 0; width: 100%; max-width: 700px; max-height: 90vh; overflow-y: auto; padding: 20px 20px 40px; animation: slideUp 0.25s ease; }
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.modal-title { font-size: 20px; font-weight: 700; color: #111827; }
+.btn-close { background: #f3f4f6; border: none; border-radius: 50%; width: 34px; height: 34px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.btn-close:hover { background: #e5e7eb; }
+
+/* ---- FORM ---- */
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+.form-input { width: 100%; border: 1.5px solid #d1d5db; border-radius: 10px; padding: 11px 14px; font-family: inherit; font-size: 15px; color: #111827; background: white; transition: border-color 0.15s; }
+.form-input:focus { outline: none; border-color: #16a34a; box-shadow: 0 0 0 3px rgba(22,163,74,0.12); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.form-select { width: 100%; border: 1.5px solid #d1d5db; border-radius: 10px; padding: 11px 14px; font-family: inherit; font-size: 15px; color: #111827; background: white; cursor: pointer; }
+.form-select:focus { outline: none; border-color: #16a34a; }
+.form-actions { display: flex; gap: 10px; margin-top: 20px; }
+.btn-save { flex: 1; background: #16a34a; color: white; border: none; border-radius: 12px; padding: 14px; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer; }
+.btn-save:hover { background: #15803d; }
+.btn-delete { background: #fee2e2; color: #dc2626; border: none; border-radius: 12px; padding: 14px 18px; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; }
+.btn-delete:hover { background: #fecaca; }
+
+/* ---- TYPE TOGGLE ---- */
+.type-toggle { display: flex; gap: 0; border: 1.5px solid #d1d5db; border-radius: 10px; overflow: hidden; margin-bottom: 14px; }
+.type-btn { flex: 1; padding: 10px; border: none; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; background: white; color: #6b7280; transition: all 0.15s; }
+.type-btn.active-income { background: #16a34a; color: white; }
+.type-btn.active-expense { background: #dc2626; color: white; }
+
+/* ---- STATUS MESSAGE ---- */
+.sync-status { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111827; color: white; padding: 10px 20px; border-radius: 99px; font-size: 14px; font-weight: 600; z-index: 300; display: none; white-space: nowrap; }
+.sync-status.show { display: block; animation: fadeIn 0.2s; }
+.sync-status.success { background: #15803d; }
+.sync-status.error { background: #dc2626; }
+@keyframes fadeIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+
+/* ---- FAB ---- */
+.fab { position: fixed; bottom: 24px; left: 24px; width: 56px; height: 56px; border-radius: 50%; background: #16a34a; color: white; border: none; font-size: 28px; cursor: pointer; box-shadow: 0 4px 14px rgba(22,163,74,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.fab:hover { background: #15803d; transform: scale(1.05); }
+
+@media (min-width: 500px) {
+  .modal-overlay { align-items: center; padding: 20px; }
+  .modal { border-radius: 20px; max-height: 80vh; }
+  .fab { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-inner">
+    <div class="header-left">
+      <h1>💰 הכנסות והוצאות</h1>
+      <div class="header-sub" id="headerSub">טוען...</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn-sync" onclick="syncToSheets()">🔄 שמור לשיטס</button>
+      <button class="btn-add-main" onclick="openModal()">+ הוספה</button>
+    </div>
+  </div>
+</div>
+
+<div class="summary">
+  <div class="summary-card card-income">
+    <div class="label">הכנסות</div>
+    <div class="amount" id="totalIncome">₪0</div>
+  </div>
+  <div class="summary-card card-balance">
+    <div class="label">יתרה</div>
+    <div class="amount" id="totalBalance">₪0</div>
+  </div>
+  <div class="summary-card card-expense">
+    <div class="label">הוצאות</div>
+    <div class="amount" id="totalExpense">₪0</div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="tabs">
+    <button class="tab income-tab active" onclick="setTab('income')">הכנסות</button>
+    <button class="tab expense-tab" onclick="setTab('expense')">הוצאות</button>
+    <button class="tab" onclick="setTab('all')" style="flex:0.7">הכל</button>
+  </div>
+
+  <div class="filter-bar">
+    <select id="filterMonth" onchange="renderList()">
+      <option value="">כל החודשים</option>
+    </select>
+    <input type="text" id="filterSearch" placeholder="חיפוש לפי שם..." oninput="renderList()">
+  </div>
+
+  <div class="entries" id="entriesList"></div>
+</div>
+
+<button class="fab" onclick="openModal()">+</button>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOnBg(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">הוספת רשומה</div>
+      <button class="btn-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <div class="type-toggle">
+      <button class="type-btn active-income" id="typeIncome" onclick="setType('income')">📥 הכנסה</button>
+      <button class="type-btn" id="typeExpense" onclick="setType('expense')">📤 הוצאה</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">שם / תיאור</label>
+      <input type="text" class="form-input" id="fieldName" placeholder="שם הלקוח / הוצאה">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">ת. ביצוע</label>
+        <input type="date" class="form-input" id="fieldExecDate">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ת. פרעון (תשלום)</label>
+        <input type="date" class="form-input" id="fieldPayDate">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">סכום (₪)</label>
+      <input type="number" class="form-input" id="fieldAmount" placeholder="0" min="0" step="0.01">
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">סטטוס</label>
+      <select class="form-select" id="fieldStatus">
+        <option value="paid">שולם ✅</option>
+        <option value="unpaid">לא שולם ❌</option>
+        <option value="partial">שולם חלקית ⚠️</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">הערות</label>
+      <input type="text" class="form-input" id="fieldNotes" placeholder="הערות נוספות...">
+    </div>
+
+    <div class="form-actions">
+      <button class="btn-delete" id="btnDelete" style="display:none" onclick="deleteEntry()">🗑️ מחיקה</button>
+      <button class="btn-save" onclick="saveEntry()">💾 שמירה</button>
+    </div>
+  </div>
+</div>
+
+<div class="sync-status" id="syncStatus"></div>
+
+<script>
+const SHEETS_SCRIPT_URL = '';  // ← הדבק כאן את כתובת ה-Apps Script לאחר פריסה
+
+let entries = [];
+let currentTab = 'income';
+let editingId = null;
+let editingType = 'income';
+
+// ---- INIT ----
+function init() {
+  loadFromStorage();
+  populateMonthFilter();
+  renderList();
+  updateSummary();
+  updateHeaderSub();
+}
+
+function loadFromStorage() {
+  const saved = localStorage.getItem('finance_entries');
+  if (saved) {
+    try { entries = JSON.parse(saved); } catch(e) { entries = []; }
+  }
+}
+
+function saveToStorage() {
+  localStorage.setItem('finance_entries', JSON.stringify(entries));
+}
+
+function updateHeaderSub() {
+  const now = new Date();
+  document.getElementById('headerSub').textContent =
+    now.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
+}
+
+// ---- TABS ----
+function setTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  const tabs = { income: 0, expense: 1, all: 2 };
+  document.querySelectorAll('.tab')[tabs[tab]].classList.add('active');
+  renderList();
+}
+
+// ---- FILTER ----
+function populateMonthFilter() {
+  const months = new Set();
+  entries.forEach(e => {
+    const d = e.execDate || e.payDate;
+    if (d) months.add(d.substring(0, 7));
+  });
+  const sel = document.getElementById('filterMonth');
+  const current = sel.value;
+  sel.innerHTML = '<option value="">כל החודשים</option>';
+  [...months].sort().reverse().forEach(m => {
+    const [y, mo] = m.split('-');
+    const label = new Date(y, mo - 1).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
+    sel.innerHTML += `<option value="${m}" ${m === current ? 'selected' : ''}>${label}</option>`;
+  });
+}
+
+function getFilteredEntries() {
+  const month = document.getElementById('filterMonth').value;
+  const search = document.getElementById('filterSearch').value.toLowerCase();
+  return entries.filter(e => {
+    if (currentTab !== 'all' && e.type !== currentTab) return false;
+    if (search && !e.name.toLowerCase().includes(search)) return false;
+    if (month) {
+      const d = e.execDate || e.payDate;
+      if (!d || !d.startsWith(month)) return false;
+    }
+    return true;
+  });
+}
+
+// ---- RENDER ----
+function renderList() {
+  const list = document.getElementById('entriesList');
+  const filtered = getFilteredEntries();
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">${currentTab === 'income' ? '📥' : currentTab === 'expense' ? '📤' : '📊'}</div><p>אין רשומות</p></div>`;
+    return;
+  }
+
+  // Sort by exec date desc
+  const sorted = [...filtered].sort((a, b) => {
+    const da = a.execDate || a.payDate || '';
+    const db = b.execDate || b.payDate || '';
+    return db.localeCompare(da);
+  });
+
+  list.innerHTML = sorted.map(e => {
+    const statusBadge = e.status === 'paid'
+      ? '<span class="badge badge-paid">שולם</span>'
+      : e.status === 'partial'
+      ? '<span class="badge badge-partial">חלקי</span>'
+      : '<span class="badge badge-unpaid">לא שולם</span>';
+
+    const execStr = e.execDate ? formatDate(e.execDate) : '';
+    const payStr = e.payDate ? formatDate(e.payDate) : '';
+
+    return `<div class="entry-card ${e.type} ${e.status === 'unpaid' ? 'unpaid' : ''}" onclick="openModal('${e.id}')">
+      <div class="entry-top">
+        <div class="entry-name">${e.name || '(ללא שם)'}</div>
+        <div class="entry-amount">${formatAmount(e.amount)}</div>
+      </div>
+      <div class="entry-meta">
+        ${execStr ? `<div class="entry-date">ביצוע: <span>${execStr}</span></div>` : ''}
+        ${payStr ? `<div class="entry-date">פרעון: <span>${payStr}</span></div>` : ''}
+      </div>
+      <div class="entry-badges">${statusBadge}</div>
+      ${e.notes ? `<div class="entry-notes">${e.notes}</div>` : ''}
+    </div>`;
+  }).join('');
+}
+
+function formatDate(d) {
+  if (!d) return '';
+  const [y, m, day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function formatAmount(a) {
+  if (!a && a !== 0) return '—';
+  return '₪' + Number(a).toLocaleString('he-IL', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+}
+
+// ---- SUMMARY ----
+function updateSummary() {
+  const income = entries.filter(e => e.type === 'income').reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const expense = entries.filter(e => e.type === 'expense').reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  document.getElementById('totalIncome').textContent = formatAmount(income);
+  document.getElementById('totalExpense').textContent = formatAmount(expense);
+  const bal = income - expense;
+  const balEl = document.getElementById('totalBalance');
+  balEl.textContent = formatAmount(bal);
+  balEl.style.color = bal >= 0 ? '#1d4ed8' : '#dc2626';
+}
+
+// ---- MODAL ----
+function openModal(id) {
+  editingId = id || null;
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.add('open');
+
+  if (id) {
+    const e = entries.find(x => x.id === id);
+    if (!e) return;
+    document.getElementById('modalTitle').textContent = 'עריכת רשומה';
+    document.getElementById('btnDelete').style.display = 'block';
+    document.getElementById('fieldName').value = e.name || '';
+    document.getElementById('fieldExecDate').value = e.execDate || '';
+    document.getElementById('fieldPayDate').value = e.payDate || '';
+    document.getElementById('fieldAmount').value = e.amount || '';
+    document.getElementById('fieldStatus').value = e.status || 'paid';
+    document.getElementById('fieldNotes').value = e.notes || '';
+    setType(e.type);
+  } else {
+    document.getElementById('modalTitle').textContent = 'הוספת רשומה';
+    document.getElementById('btnDelete').style.display = 'none';
+    document.getElementById('fieldName').value = '';
+    document.getElementById('fieldExecDate').value = todayStr();
+    document.getElementById('fieldPayDate').value = '';
+    document.getElementById('fieldAmount').value = '';
+    document.getElementById('fieldStatus').value = 'unpaid';
+    document.getElementById('fieldNotes').value = '';
+    setType(currentTab === 'expense' ? 'expense' : 'income');
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalOverlay').classList.remove('open');
+  editingId = null;
+}
+
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function setType(type) {
+  editingType = type;
+  document.getElementById('typeIncome').className = 'type-btn' + (type === 'income' ? ' active-income' : '');
+  document.getElementById('typeExpense').className = 'type-btn' + (type === 'expense' ? ' active-expense' : '');
+}
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// ---- SAVE / DELETE ----
+function saveEntry() {
+  const name = document.getElementById('fieldName').value.trim();
+  if (!name) { alert('נא להזין שם'); return; }
+
+  const entry = {
+    id: editingId || Date.now().toString(),
+    type: editingType,
+    name,
+    execDate: document.getElementById('fieldExecDate').value,
+    payDate: document.getElementById('fieldPayDate').value,
+    amount: parseFloat(document.getElementById('fieldAmount').value) || 0,
+    status: document.getElementById('fieldStatus').value,
+    notes: document.getElementById('fieldNotes').value.trim(),
+  };
+
+  if (editingId) {
+    const idx = entries.findIndex(e => e.id === editingId);
+    if (idx !== -1) entries[idx] = entry;
+  } else {
+    entries.push(entry);
+  }
+
+  saveToStorage();
+  populateMonthFilter();
+  renderList();
+  updateSummary();
+  closeModal();
+  showStatus('נשמר בהצלחה ✓', 'success');
+}
+
+function deleteEntry() {
+  if (!editingId) return;
+  if (!confirm('למחוק את הרשומה?')) return;
+  entries = entries.filter(e => e.id !== editingId);
+  saveToStorage();
+  populateMonthFilter();
+  renderList();
+  updateSummary();
+  closeModal();
+  showStatus('נמחק', 'success');
+}
+
+// ---- SYNC TO SHEETS ----
+async function syncToSheets() {
+  if (!SHEETS_SCRIPT_URL) {
+    alert('⚠️ כתובת ה-Apps Script אינה מוגדרת.\n\nעקוב אחרי ההוראות ב-README כדי לפרוס את הסקריפט ולהדביק את הכתובת.');
+    return;
+  }
+  showStatus('🔄 שומר לגוגל שיטס...', '');
+  try {
+    const payload = JSON.stringify(entries);
+    const url = SHEETS_SCRIPT_URL + '?data=' + encodeURIComponent(payload);
+    const res = await fetch(url);
+    const json = await res.json();
+    if (json.success) {
+      showStatus('✅ נשמר לגוגל שיטס!', 'success');
+    } else {
+      throw new Error(json.error || 'שגיאה לא ידועה');
+    }
+  } catch(err) {
+    showStatus('❌ שגיאה: ' + err.message, 'error');
+  }
+}
+
+// ---- STATUS ----
+function showStatus(msg, type) {
+  const el = document.getElementById('syncStatus');
+  el.textContent = msg;
+  el.className = 'sync-status show ' + type;
+  clearTimeout(el._timer);
+  el._timer = setTimeout(() => { el.classList.remove('show'); }, 3000);
+}
+
+// ---- SERVICE WORKER ----
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// ---- START ----
+init();
+</script>
+</body>
+</html>
