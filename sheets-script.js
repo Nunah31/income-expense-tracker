@@ -24,6 +24,10 @@ function doGet(e) {
 }
 
 function doPost(e) {
+  const cb = null;
+  if (e.parameter && e.parameter.key !== SECRET_KEY) {
+    return buildResponse({ success: false, error: 'unauthorized' }, cb);
+  }
   try {
     let entries;
     if (e.postData && e.postData.contents) {
@@ -31,12 +35,12 @@ function doPost(e) {
     } else if (e.parameter && e.parameter.data) {
       entries = JSON.parse(e.parameter.data);
     } else {
-      return buildResponse({ success: false, error: 'no data' });
+      return buildResponse({ success: false, error: 'no data' }, cb);
     }
     syncSheet(entries);
-    return buildResponse({ success: true, count: entries.length });
+    return buildResponse({ success: true, count: entries.length }, cb);
   } catch (err) {
-    return buildResponse({ success: false, error: err.message });
+    return buildResponse({ success: false, error: err.message }, cb);
   }
 }
 

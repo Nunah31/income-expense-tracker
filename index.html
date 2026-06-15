@@ -663,10 +663,13 @@ async function loadFromSheets(silent) {
 async function syncToSheets(silent) {
   if (!SHEETS_SCRIPT_URL) return;
   try {
-    const payload = JSON.stringify(entries);
-    const url = SHEETS_SCRIPT_URL + '?key=' + encodeURIComponent(SECRET_KEY) + '&data=' + encodeURIComponent(payload);
-    // no-cors: הדפדפן שולח את הבקשה, הנתונים נשמרים, אנחנו לא קוראים תשובה
-    await fetch(url, { mode: 'no-cors' });
+    const url = SHEETS_SCRIPT_URL + '?key=' + encodeURIComponent(SECRET_KEY);
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(entries),
+    });
     showStatus('✅ נשמר לשיטס', 'success');
   } catch(err) {
     showStatus('❌ שיטס: ' + err.message, 'error');
