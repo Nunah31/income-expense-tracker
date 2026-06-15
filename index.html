@@ -111,6 +111,20 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .type-btn.active-income { background: #16a34a; color: white; }
 .type-btn.active-expense { background: #dc2626; color: white; }
 
+/* ---- MULTI-AMOUNT ---- */
+.amounts-box { border: 1.5px solid #d1d5db; border-radius: 10px; padding: 10px 12px; background: white; }
+.amounts-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 8px; }
+.amount-row { display: flex; align-items: center; gap: 8px; }
+.amount-row input { flex: 1; border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 7px 10px; font-family: inherit; font-size: 14px; color: #111827; background: #f9fafb; }
+.amount-row input:focus { outline: none; border-color: #16a34a; background: white; }
+.amount-row .note-inp { flex: 1.5; font-size: 13px; color: #6b7280; }
+.btn-remove-amt { background: #fee2e2; border: none; border-radius: 6px; width: 28px; height: 28px; color: #dc2626; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.btn-add-amt { width: 100%; border: 1.5px dashed #d1d5db; border-radius: 8px; padding: 7px; background: transparent; color: #6b7280; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-add-amt:hover { border-color: #16a34a; color: #16a34a; }
+.amounts-total { font-size: 14px; font-weight: 700; color: #374151; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e5e7eb; text-align: left; }
+.sub-amounts-display { font-size: 12px; color: #6b7280; margin-top: 4px; display: flex; flex-wrap: wrap; gap: 4px; }
+.sub-amt-chip { background: #fef3c7; color: #92400e; border-radius: 99px; padding: 2px 8px; font-size: 11px; font-weight: 600; }
+
 /* ---- QUICK EDIT ---- */
 .quick-edit { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6; align-items: center; }
 .qe-select { flex: 1; border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 7px 10px; font-family: inherit; font-size: 13px; font-weight: 600; color: #374151; background: #f9fafb; cursor: pointer; }
@@ -242,9 +256,20 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       </div>
     </div>
 
-    <div class="form-group">
+    <!-- הכנסות: שדה סכום רגיל -->
+    <div class="form-group" id="amountSimple">
       <label class="form-label">סכום (₪)</label>
       <input type="number" class="form-input" id="fieldAmount" placeholder="0" min="0" step="0.01">
+    </div>
+
+    <!-- הוצאות: סכומים מרובים -->
+    <div class="form-group" id="amountMulti" style="display:none">
+      <label class="form-label">סכומים (חשבוניות)</label>
+      <div class="amounts-box">
+        <div class="amounts-list" id="amountsList"></div>
+        <button type="button" class="btn-add-amt" onclick="addAmountRow()">+ הוסף חשבונית</button>
+        <div class="amounts-total" id="amountsTotal">סה"כ: ₪0</div>
+      </div>
     </div>
 
     <div class="form-row">
@@ -417,6 +442,10 @@ function renderList() {
       </div>
       <div class="entry-badges">${statusBadge}</div>
       ${e.notes ? `<div class="entry-notes">${e.notes}</div>` : ''}
+      ${isExpense && e.subAmounts && e.subAmounts.length > 1 ? `
+        <div class="sub-amounts-display">
+          ${e.subAmounts.map(s => `<span class="sub-amt-chip">${s.note ? s.note + ': ' : ''}₪${Number(s.value).toLocaleString('he-IL')}</span>`).join('')}
+        </div>` : ''}
       ${quickEdit}
     </div>`;
   }).join('');
@@ -527,6 +556,12 @@ function openModal(id) {
     document.getElementById('fieldPaidDate').value = e.paidDate || '';
     document.getElementById('fieldNotes').value = e.notes || '';
     setType(e.type);
+    if (e.type === 'expense') {
+      document.getElementById('amountsList').innerHTML = '';
+      const subs = e.subAmounts && e.subAmounts.length ? e.subAmounts : (e.amount ? [{value: e.amount, note: ''}] : []);
+      subs.forEach(s => addAmountRow(s.value || '', s.note || ''));
+      if (!subs.length) addAmountRow();
+    }
   } else {
     document.getElementById('modalTitle').textContent = 'הוספת רשומה';
     document.getElementById('btnDelete').style.display = 'none';
@@ -537,7 +572,12 @@ function openModal(id) {
     document.getElementById('fieldStatus').value = 'unpaid';
     document.getElementById('fieldPaidDate').value = '';
     document.getElementById('fieldNotes').value = '';
-    setType(currentTab === 'expense' ? 'expense' : 'income');
+    const type = currentTab === 'expense' ? 'expense' : 'income';
+    setType(type);
+    if (type === 'expense') {
+      document.getElementById('amountsList').innerHTML = '';
+      addAmountRow();
+    }
   }
 }
 
@@ -554,6 +594,41 @@ function setType(type) {
   editingType = type;
   document.getElementById('typeIncome').className = 'type-btn' + (type === 'income' ? ' active-income' : '');
   document.getElementById('typeExpense').className = 'type-btn' + (type === 'expense' ? ' active-expense' : '');
+  document.getElementById('amountSimple').style.display = type === 'income' ? '' : 'none';
+  document.getElementById('amountMulti').style.display  = type === 'expense' ? '' : 'none';
+}
+
+// ---- MULTI-AMOUNT ----
+function addAmountRow(value = '', note = '') {
+  const list = document.getElementById('amountsList');
+  const div = document.createElement('div');
+  div.className = 'amount-row';
+  div.innerHTML = `
+    <input type="number" placeholder="סכום ₪" min="0" step="0.01" value="${value}"
+      oninput="updateAmountsTotal()" class="amount-inp">
+    <input type="text" placeholder="תיאור (אופציונלי)" value="${note}" class="note-inp">
+    <button type="button" class="btn-remove-amt" onclick="removeAmountRow(this)">✕</button>`;
+  list.appendChild(div);
+  updateAmountsTotal();
+  div.querySelector('.amount-inp').focus();
+}
+
+function removeAmountRow(btn) {
+  btn.closest('.amount-row').remove();
+  updateAmountsTotal();
+}
+
+function updateAmountsTotal() {
+  const total = getSubAmounts().reduce((s, a) => s + a.value, 0);
+  document.getElementById('amountsTotal').textContent =
+    'סה"כ: ₪' + total.toLocaleString('he-IL');
+}
+
+function getSubAmounts() {
+  return [...document.querySelectorAll('#amountsList .amount-row')].map(row => ({
+    value: parseFloat(row.querySelector('.amount-inp').value) || 0,
+    note:  row.querySelector('.note-inp').value.trim(),
+  })).filter(a => a.value > 0 || a.note);
 }
 
 function todayStr() {
@@ -565,13 +640,23 @@ function saveEntry() {
   const name = document.getElementById('fieldName').value.trim();
   if (!name) { alert('נא להזין שם'); return; }
 
+  let amount, subAmounts;
+  if (editingType === 'expense') {
+    subAmounts = getSubAmounts();
+    amount = subAmounts.reduce((s, a) => s + a.value, 0);
+  } else {
+    amount = parseFloat(document.getElementById('fieldAmount').value) || 0;
+    subAmounts = [];
+  }
+
   const entry = {
     id: editingId || Date.now().toString(),
     type: editingType,
     name,
     execDate: document.getElementById('fieldExecDate').value,
     payDate: document.getElementById('fieldPayDate').value,
-    amount: parseFloat(document.getElementById('fieldAmount').value) || 0,
+    amount,
+    subAmounts,
     status: document.getElementById('fieldStatus').value,
     paidDate: document.getElementById('fieldPaidDate').value,
     notes: document.getElementById('fieldNotes').value.trim(),
