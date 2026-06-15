@@ -125,6 +125,27 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 </head>
 <body>
 
+<!-- LOGIN SCREEN -->
+<div id="loginScreen" style="display:none; position:fixed; inset:0; background:linear-gradient(135deg,#14532d,#16a34a); z-index:999; align-items:center; justify-content:center; flex-direction:column; gap:20px;">
+  <div style="font-size:52px;">💰</div>
+  <div style="color:white; font-size:26px; font-weight:700;">הכנסות והוצאות</div>
+  <div style="background:white; border-radius:20px; padding:28px 32px; width:300px; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+    <div style="font-size:15px; color:#6b7280; margin-bottom:16px; font-weight:600;">הזיני קוד כניסה</div>
+    <input id="pinInput" type="password" inputmode="numeric" maxlength="10"
+      style="width:100%; border:2px solid #d1d5db; border-radius:12px; padding:14px; font-size:22px; text-align:center; letter-spacing:6px; font-family:inherit; outline:none;"
+      placeholder="••••"
+      onkeydown="if(event.key==='Enter') checkPin()"
+      onfocus="this.style.borderColor='#16a34a'"
+      onblur="this.style.borderColor='#d1d5db'">
+    <div id="pinError" style="color:#dc2626; font-size:13px; margin-top:8px; display:none;">קוד שגוי, נסי שנית</div>
+    <button onclick="checkPin()"
+      style="margin-top:14px; width:100%; background:#16a34a; color:white; border:none; border-radius:12px; padding:14px; font-size:16px; font-weight:700; cursor:pointer; font-family:inherit;">
+      כניסה
+    </button>
+  </div>
+  <div style="color:rgba(255,255,255,0.6); font-size:13px;">גישה מורשית בלבד</div>
+</div>
+
 <div class="header">
   <div class="header-inner">
     <div class="header-left">
@@ -232,6 +253,8 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 
 <script>
 const SHEETS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKP0tmpvwxzWKV8dB6RP6gTW_EalUrVSYFA9XKYBU4wbhEaSxJPoMtkj_BiZi2dW978A/exec';
+const APP_PIN = '1234';       // ← שני את הקוד לקוד שתבחרי
+const SECRET_KEY = 'habari25'; // ← שני גם את זה (חייב להיות זהה ב-Apps Script)
 
 let entries = [];
 let currentTab = 'income';
@@ -239,12 +262,23 @@ let editingId = null;
 let editingType = 'income';
 
 // ---- INIT ----
-function init() {
+function startApp() {
   loadFromStorage();
   populateMonthFilter();
   renderList();
   updateSummary();
   updateHeaderSub();
+  if (entries.length === 0 && SHEETS_SCRIPT_URL) loadFromSheets();
+}
+
+function init() {
+  if (sessionStorage.getItem('auth') === '1') {
+    startApp();
+  } else {
+    const ls = document.getElementById('loginScreen');
+    ls.style.display = 'flex';
+    setTimeout(() => document.getElementById('pinInput').focus(), 100);
+  }
 }
 
 function loadFromStorage() {
@@ -463,6 +497,31 @@ function deleteEntry() {
 }
 
 // ---- LOAD FROM SHEETS ----
+// ---- AUTH ----
+function checkPin() {
+  const val = document.getElementById('pinInput').value;
+  if (val === APP_PIN) {
+    sessionStorage.setItem('auth', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    startApp();
+  } else {
+    const err = document.getElementById('pinError');
+    err.style.display = 'block';
+    document.getElementById('pinInput').value = '';
+    setTimeout(() => { err.style.display = 'none'; }, 2500);
+  }
+}
+
+function requireAuth() {
+  if (sessionStorage.getItem('auth') !== '1') {
+    const ls = document.getElementById('loginScreen');
+    ls.style.display = 'flex';
+    setTimeout(() => document.getElementById('pinInput').focus(), 100);
+    return false;
+  }
+  return true;
+}
+
 // ---- JSONP helper (עוקף CORS) ----
 function jsonp(url) {
   return new Promise((resolve, reject) => {
@@ -474,7 +533,7 @@ function jsonp(url) {
       resolve(data);
     };
     script.onerror = () => { delete window[cb]; script.remove(); reject(new Error('JSONP נכשל')); };
-    script.src = url + (url.includes('?') ? '&' : '?') + 'callback=' + cb;
+    script.src = url + (url.includes('?') ? '&' : '?') + 'key=' + SECRET_KEY + '&callback=' + cb;
     document.head.appendChild(script);
   });
 }
@@ -535,8 +594,6 @@ if ('serviceWorker' in navigator) {
 
 // ---- START ----
 init();
-// טעינה אוטומטית מהשיטס אם אין נתונים מקומיים
-if (entries.length === 0 && SHEETS_SCRIPT_URL) loadFromSheets();
 </script>
 </body>
 </html>

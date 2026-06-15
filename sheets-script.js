@@ -3,9 +3,13 @@
 // גיליון: זכות
 
 const SHEET_NAME = 'זכות';
+const SECRET_KEY = 'habari25'; // ← חייב להיות זהה לקוד באפליקציה
 
 function doGet(e) {
   const cb = e.parameter.callback || null;
+  if (e.parameter.key !== SECRET_KEY) {
+    return buildResponse({ success: false, error: 'unauthorized' }, cb);
+  }
   try {
     if (e.parameter && e.parameter.data) {
       const entries = JSON.parse(e.parameter.data);
