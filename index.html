@@ -111,6 +111,13 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .type-btn.active-income { background: #16a34a; color: white; }
 .type-btn.active-expense { background: #dc2626; color: white; }
 
+/* ---- QUICK EDIT ---- */
+.quick-edit { display: flex; gap: 8px; margin-top: 10px; padding-top: 10px; border-top: 1px solid #f3f4f6; align-items: center; }
+.qe-select { flex: 1; border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 7px 10px; font-family: inherit; font-size: 13px; font-weight: 600; color: #374151; background: #f9fafb; cursor: pointer; }
+.qe-select:focus { outline: none; border-color: #dc2626; }
+.qe-date { border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 7px 10px; font-family: inherit; font-size: 13px; color: #374151; background: #f9fafb; width: 140px; }
+.qe-date:focus { outline: none; border-color: #dc2626; }
+
 /* ---- STATUS MESSAGE ---- */
 .sync-status { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #111827; color: white; padding: 10px 20px; border-radius: 99px; font-size: 14px; font-weight: 600; z-index: 300; display: none; white-space: nowrap; }
 .sync-status.show { display: block; animation: fadeIn 0.2s; }
@@ -240,13 +247,22 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <input type="number" class="form-input" id="fieldAmount" placeholder="0" min="0" step="0.01">
     </div>
 
-    <div class="form-group">
-      <label class="form-label">סטטוס</label>
-      <select class="form-select" id="fieldStatus">
-        <option value="paid">שולם ✅</option>
-        <option value="unpaid">לא שולם ❌</option>
-        <option value="partial">שולם חלקית ⚠️</option>
-      </select>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">סטטוס</label>
+        <select class="form-select" id="fieldStatus">
+          <option value="unpaid">לא שולם ❌</option>
+          <option value="paid">שולם ✅</option>
+          <option value="paid_bit">שולם בביט 📱</option>
+          <option value="paid_paybox">שולם בפייבוקס 💜</option>
+          <option value="paid_transfer">שולם בהעברה 🏦</option>
+          <option value="partial">שולם חלקית ⚠️</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ת. ביצוע תשלום</label>
+        <input type="date" class="form-input" id="fieldPaidDate">
+      </div>
     </div>
 
     <div class="form-group">
@@ -361,36 +377,77 @@ function renderList() {
     return;
   }
 
-  // Sort by exec date desc
+  // הוצאות — מיון לפי פרעון; שאר — לפי ביצוע
   const sorted = [...filtered].sort((a, b) => {
-    const da = a.execDate || a.payDate || '';
-    const db = b.execDate || b.payDate || '';
+    const da = (currentTab === 'expense' ? a.payDate || a.execDate : a.execDate || a.payDate) || '';
+    const db = (currentTab === 'expense' ? b.payDate || b.execDate : b.execDate || b.payDate) || '';
     return db.localeCompare(da);
   });
 
   list.innerHTML = sorted.map(e => {
-    const statusBadge = e.status === 'paid'
-      ? '<span class="badge badge-paid">שולם</span>'
-      : e.status === 'partial'
-      ? '<span class="badge badge-partial">חלקי</span>'
-      : '<span class="badge badge-unpaid">לא שולם</span>';
-
+    const statusBadge = statusBadgeHtml(e.status);
     const execStr = e.execDate ? formatDate(e.execDate) : '';
     const payStr = e.payDate ? formatDate(e.payDate) : '';
+    const paidStr = e.paidDate ? formatDate(e.paidDate) : '';
+    const isExpense = e.type === 'expense';
 
-    return `<div class="entry-card ${e.type} ${e.status === 'unpaid' ? 'unpaid' : ''}" onclick="openModal('${e.id}')">
+    const quickEdit = isExpense ? `
+      <div class="quick-edit" onclick="event.stopPropagation()">
+        <select class="qe-select" onchange="quickSave('${e.id}','status',this.value)">
+          ${statusOptions(e.status)}
+        </select>
+        <input type="date" class="qe-date" value="${e.paidDate||''}" title="ת. ביצוע תשלום"
+          onchange="quickSave('${e.id}','paidDate',this.value)">
+      </div>` : '';
+
+    return `<div class="entry-card ${e.type} ${e.status==='unpaid'?'unpaid':''}" onclick="openModal('${e.id}')">
       <div class="entry-top">
-        <div class="entry-name">${e.name || '(ללא שם)'}</div>
+        <div class="entry-name">${e.name||'(ללא שם)'}</div>
         <div class="entry-amount">${formatAmount(e.amount)}</div>
       </div>
       <div class="entry-meta">
         ${execStr ? `<div class="entry-date">ביצוע: <span>${execStr}</span></div>` : ''}
         ${payStr ? `<div class="entry-date">פרעון: <span>${payStr}</span></div>` : ''}
+        ${paidStr ? `<div class="entry-date">שולם: <span>${paidStr}</span></div>` : ''}
       </div>
       <div class="entry-badges">${statusBadge}</div>
       ${e.notes ? `<div class="entry-notes">${e.notes}</div>` : ''}
+      ${quickEdit}
     </div>`;
   }).join('');
+}
+
+function statusBadgeHtml(s) {
+  const map = {
+    paid:          '<span class="badge badge-paid">שולם ✅</span>',
+    paid_bit:      '<span class="badge badge-paid">ביט 📱</span>',
+    paid_paybox:   '<span class="badge badge-paid">פייבוקס 💜</span>',
+    paid_transfer: '<span class="badge badge-paid">העברה 🏦</span>',
+    partial:       '<span class="badge badge-partial">חלקי ⚠️</span>',
+    unpaid:        '<span class="badge badge-unpaid">לא שולם ❌</span>',
+  };
+  return map[s] || map.unpaid;
+}
+
+function statusOptions(current) {
+  const opts = [
+    ['unpaid','לא שולם ❌'],
+    ['paid','שולם ✅'],
+    ['paid_bit','שולם בביט 📱'],
+    ['paid_paybox','שולם בפייבוקס 💜'],
+    ['paid_transfer','שולם בהעברה 🏦'],
+    ['partial','שולם חלקית ⚠️'],
+  ];
+  return opts.map(([v,l]) => `<option value="${v}"${v===current?' selected':''}>${l}</option>`).join('');
+}
+
+function quickSave(id, field, value) {
+  const idx = entries.findIndex(e => e.id === id);
+  if (idx === -1) return;
+  entries[idx][field] = value;
+  saveToStorage();
+  renderList();
+  updateSummary();
 }
 
 function formatDate(d) {
@@ -460,7 +517,8 @@ function openModal(id) {
     document.getElementById('fieldExecDate').value = e.execDate || '';
     document.getElementById('fieldPayDate').value = e.payDate || '';
     document.getElementById('fieldAmount').value = e.amount || '';
-    document.getElementById('fieldStatus').value = e.status || 'paid';
+    document.getElementById('fieldStatus').value = e.status || 'unpaid';
+    document.getElementById('fieldPaidDate').value = e.paidDate || '';
     document.getElementById('fieldNotes').value = e.notes || '';
     setType(e.type);
   } else {
@@ -471,6 +529,7 @@ function openModal(id) {
     document.getElementById('fieldPayDate').value = '';
     document.getElementById('fieldAmount').value = '';
     document.getElementById('fieldStatus').value = 'unpaid';
+    document.getElementById('fieldPaidDate').value = '';
     document.getElementById('fieldNotes').value = '';
     setType(currentTab === 'expense' ? 'expense' : 'income');
   }
@@ -508,6 +567,7 @@ function saveEntry() {
     payDate: document.getElementById('fieldPayDate').value,
     amount: parseFloat(document.getElementById('fieldAmount').value) || 0,
     status: document.getElementById('fieldStatus').value,
+    paidDate: document.getElementById('fieldPaidDate').value,
     notes: document.getElementById('fieldNotes').value.trim(),
   };
 
