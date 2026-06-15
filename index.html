@@ -681,12 +681,12 @@ async function syncToSheets(silent) {
     const payload = JSON.stringify(entries);
     const json = await jsonp(SHEETS_SCRIPT_URL + '?data=' + encodeURIComponent(payload));
     if (json.success) {
-      showStatus('✅ נשמר אוטומטית', 'success');
+      showStatus('✅ נשמר לשיטס', 'success');
     } else {
-      if (!silent) showStatus('❌ ' + (json.error || 'שגיאה'), 'error');
+      showStatus('❌ שיטס: ' + (json.error || 'שגיאה'), 'error');
     }
   } catch(err) {
-    if (!silent) showStatus('❌ ' + err.message, 'error');
+    showStatus('❌ שיטס: ' + err.message, 'error');
   }
 }
 
