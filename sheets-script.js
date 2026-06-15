@@ -99,40 +99,48 @@ function readFromSheet() {
   const lastRow = sheet.getLastRow();
   if (lastRow < 5) return [];
 
-  const data = sheet.getRange(5, 1, lastRow - 4, 14).getValues();
+  // INC_START=1 (A), EXP_START=10 (J) → צריך 16 עמודות (A-P)
+  const data = sheet.getRange(5, 1, lastRow - 4, 16).getValues();
   const entries = [];
+  const fmtDate = v => v instanceof Date ? Utilities.formatDate(v, 'Asia/Jerusalem', 'yyyy-MM-dd') : '';
 
   data.forEach((row, i) => {
+    // הכנסות: עמודות A-G = indices 0-6
     if (row[0]) {
       entries.push({
-        id: row[6] || ('inc_' + i),
+        id: 'inc_' + i,
         type: 'income',
         name: row[0],
-        execDate: row[1] ? Utilities.formatDate(new Date(row[1]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
-        payDate: row[2] ? Utilities.formatDate(new Date(row[2]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
-        amount: row[3] || 0,
-        notes: row[4] || '',
-        status: statusKey(row[5]),
-        paidDate: row[6] && row[6] instanceof Date ? Utilities.formatDate(new Date(row[6]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
+        execDate: fmtDate(row[1]),
+        payDate:  fmtDate(row[2]),
+        amount:   row[3] || 0,
+        notes:    row[4] || '',
+        status:   statusKey(row[5]),
+        paidDate: fmtDate(row[6]),
       });
     }
-    if (row[7]) {
+    // הוצאות: עמודות J-P = indices 9-15
+    if (row[9]) {
       entries.push({
-        id: row[13] || ('exp_' + i),
+        id: 'exp_' + i,
         type: 'expense',
-        name: row[7],
-        execDate: row[8] ? Utilities.formatDate(new Date(row[8]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
-        payDate: row[9] ? Utilities.formatDate(new Date(row[9]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
-        amount: row[10] || 0,
-        notes: row[11] || '',
-        status: statusKey(row[12]),
-        paidDate: row[13] && row[13] instanceof Date ? Utilities.formatDate(new Date(row[13]), 'Asia/Jerusalem', 'yyyy-MM-dd') : '',
+        name: row[9],
+        execDate: fmtDate(row[10]),
+        payDate:  fmtDate(row[11]),
+        amount:   row[12] || 0,
+        notes:    row[13] || '',
+        status:   statusKey(row[14]),
+        paidDate: fmtDate(row[15]),
       });
     }
   });
 
   return entries;
 }
+
+// עמודות: הכנסות A-G, רווח H-I, הוצאות J-P
+const INC_START = 1;  // A
+const EXP_START = 10; // J
 
 // בניה מחדש של הגיליון מהרשומות שב-Properties
 function rebuildSheet() {
@@ -145,52 +153,88 @@ function rebuildSheet() {
   let sheet = ss.getSheetByName(SHEET_NAME);
   if (!sheet) sheet = ss.insertSheet(SHEET_NAME);
 
-  const income = allEntries.filter(e => e.type === 'income');
+  const income  = allEntries.filter(e => e.type === 'income');
   const expense = allEntries.filter(e => e.type === 'expense');
   const rows = Math.max(income.length, expense.length);
 
-  sheet.clearContents();
-  sheet.getRange('A3').setValue('הכנסות').setFontWeight('bold').setFontSize(13);
-  sheet.getRange('H3').setValue('הוצאות').setFontWeight('bold').setFontSize(13);
+  const GREEN_DARK  = '#1e7e34';
+  const GREEN_LIGHT = '#c6efce';
+  const RED_DARK    = '#c0392b';
+  const RED_LIGHT   = '#ffc7ce';
+  const WHITE       = '#ffffff';
 
+  sheet.clear(); // מנקה תוכן + עיצוב
+
+  // ---- כותרות טבלה (שורה 3) ----
+  const incTitle = sheet.getRange(3, INC_START, 1, 7);
+  incTitle.merge();
+  incTitle.setValue('הכנסות')
+    .setFontWeight('bold').setFontSize(13).setFontColor(WHITE)
+    .setBackground(GREEN_DARK).setHorizontalAlignment('center');
+
+  const expTitle = sheet.getRange(3, EXP_START, 1, 7);
+  expTitle.merge();
+  expTitle.setValue('הוצאות')
+    .setFontWeight('bold').setFontSize(13).setFontColor(WHITE)
+    .setBackground(RED_DARK).setHorizontalAlignment('center');
+
+  // ---- כותרות עמודות (שורה 4) ----
   const headers = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'הערות', 'סטטוס', 'ת.תשלום'];
-  headers.forEach((h, i) => sheet.getRange(4, i + 1).setValue(h).setFontWeight('bold'));
-  headers.forEach((h, i) => sheet.getRange(4, i + 8).setValue(h).setFontWeight('bold'));
 
+  const incHeaders = sheet.getRange(4, INC_START, 1, 7);
+  incHeaders.setValues([headers])
+    .setFontWeight('bold').setBackground(GREEN_LIGHT)
+    .setHorizontalAlignment('center');
+
+  const expHeaders = sheet.getRange(4, EXP_START, 1, 7);
+  expHeaders.setValues([headers])
+    .setFontWeight('bold').setBackground(RED_LIGHT)
+    .setHorizontalAlignment('center');
+
+  // ---- נתונים ----
   for (let i = 0; i < rows; i++) {
     const row = i + 5;
     if (income[i]) {
       const e = income[i];
-      sheet.getRange(row, 1).setValue(e.name || '');
-      sheet.getRange(row, 2).setValue(e.execDate ? new Date(e.execDate) : '');
-      sheet.getRange(row, 3).setValue(e.payDate ? new Date(e.payDate) : '');
-      sheet.getRange(row, 4).setValue(e.amount || 0);
-      sheet.getRange(row, 5).setValue(e.notes || '');
-      sheet.getRange(row, 6).setValue(statusLabel(e.status));
-      sheet.getRange(row, 7).setValue(e.paidDate ? new Date(e.paidDate) : '');
+      sheet.getRange(row, INC_START,     1, 1).setValue(e.name || '');
+      sheet.getRange(row, INC_START + 1, 1, 1).setValue(e.execDate  ? new Date(e.execDate)  : '');
+      sheet.getRange(row, INC_START + 2, 1, 1).setValue(e.payDate   ? new Date(e.payDate)   : '');
+      sheet.getRange(row, INC_START + 3, 1, 1).setValue(e.amount || 0);
+      sheet.getRange(row, INC_START + 4, 1, 1).setValue(e.notes || '');
+      sheet.getRange(row, INC_START + 5, 1, 1).setValue(statusLabel(e.status));
+      sheet.getRange(row, INC_START + 6, 1, 1).setValue(e.paidDate  ? new Date(e.paidDate)  : '');
+      sheet.getRange(row, INC_START, 1, 7).setBackground('#f0fff4'); // ירוק בהיר מאוד לשורות
     }
     if (expense[i]) {
       const e = expense[i];
-      sheet.getRange(row, 8).setValue(e.name || '');
-      sheet.getRange(row, 9).setValue(e.execDate ? new Date(e.execDate) : '');
-      sheet.getRange(row, 10).setValue(e.payDate ? new Date(e.payDate) : '');
-      sheet.getRange(row, 11).setValue(e.amount || 0);
-      sheet.getRange(row, 12).setValue(e.notes || '');
-      sheet.getRange(row, 13).setValue(statusLabel(e.status));
-      sheet.getRange(row, 14).setValue(e.paidDate ? new Date(e.paidDate) : '');
+      sheet.getRange(row, EXP_START,     1, 1).setValue(e.name || '');
+      sheet.getRange(row, EXP_START + 1, 1, 1).setValue(e.execDate  ? new Date(e.execDate)  : '');
+      sheet.getRange(row, EXP_START + 2, 1, 1).setValue(e.payDate   ? new Date(e.payDate)   : '');
+      sheet.getRange(row, EXP_START + 3, 1, 1).setValue(e.amount || 0);
+      sheet.getRange(row, EXP_START + 4, 1, 1).setValue(e.notes || '');
+      sheet.getRange(row, EXP_START + 5, 1, 1).setValue(statusLabel(e.status));
+      sheet.getRange(row, EXP_START + 6, 1, 1).setValue(e.paidDate  ? new Date(e.paidDate)  : '');
+      sheet.getRange(row, EXP_START, 1, 7).setBackground('#fff0f0'); // ורוד בהיר מאוד לשורות
     }
   }
 
+  // ---- פורמט תאריכים וסכומים ----
   if (rows > 0) {
-    sheet.getRange(5, 2, rows, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(5, 3, rows, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(5, 7, rows, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(5, 9, rows, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(5, 10, rows, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(5, 14, rows, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(5, 4, rows, 1).setNumberFormat('₪#,##0');
-    sheet.getRange(5, 11, rows, 1).setNumberFormat('₪#,##0');
+    sheet.getRange(5, INC_START + 1, rows, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(5, INC_START + 2, rows, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(5, INC_START + 6, rows, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(5, EXP_START + 1, rows, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(5, EXP_START + 2, rows, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(5, EXP_START + 6, rows, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(5, INC_START + 3, rows, 1).setNumberFormat('₪#,##0');
+    sheet.getRange(5, EXP_START + 3, rows, 1).setNumberFormat('₪#,##0');
   }
+
+  // ---- רוחב עמודות ----
+  sheet.setColumnWidth(INC_START,     160); // שם הכנסה
+  sheet.setColumnWidth(INC_START + 4, 200); // הערות הכנסה
+  sheet.setColumnWidth(EXP_START,     140); // שם הוצאה
+  sheet.setColumnWidth(EXP_START + 4, 200); // הערות הוצאה
 }
 
 function statusLabel(key) {
