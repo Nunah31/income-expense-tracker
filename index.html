@@ -319,13 +319,6 @@ function loadFromStorage() {
 
 function saveToStorage() {
   localStorage.setItem('finance_entries', JSON.stringify(entries));
-  scheduleSyncToSheets();
-}
-
-let syncTimer = null;
-function scheduleSyncToSheets() {
-  clearTimeout(syncTimer);
-  syncTimer = setTimeout(() => syncToSheets(true), 2000); // שמור 2 שניות אחרי השינוי האחרון
 }
 
 function updateHeaderSub() {
@@ -455,6 +448,7 @@ function quickSave(id, field, value) {
   saveToStorage();
   renderList();
   updateSummary();
+  syncEntryToSheets(entries[idx]);
 }
 
 function formatDate(d) {
@@ -590,19 +584,22 @@ function saveEntry() {
   renderList();
   updateSummary();
   closeModal();
-  showStatus('נשמר בהצלחה ✓', 'success');
+  showStatus('נשמר ✓', 'success');
+  syncEntryToSheets(entry).then(ok => { if (ok) showStatus('✅ נשמר לשיטס', 'success'); });
 }
 
 function deleteEntry() {
   if (!editingId) return;
   if (!confirm('למחוק את הרשומה?')) return;
-  entries = entries.filter(e => e.id !== editingId);
+  const deletedId = editingId;
+  entries = entries.filter(e => e.id !== deletedId);
   saveToStorage();
   populateMonthFilter();
   renderList();
   updateSummary();
   closeModal();
   showStatus('נמחק', 'success');
+  deleteEntryFromSheets(deletedId);
 }
 
 // ---- LOAD FROM SHEETS ----
@@ -660,27 +657,56 @@ async function loadFromSheets(silent) {
 }
 
 // ---- SYNC TO SHEETS ----
-async function syncToSheets(silent) {
-  if (!SHEETS_SCRIPT_URL) return;
+
+// שמירת רשומה אחת לשיטס (URL קצר — לא נכשל)
+async function syncEntryToSheets(entry) {
+  if (!SHEETS_SCRIPT_URL) return true;
   try {
-    const payload = JSON.stringify(entries);
     const url = SHEETS_SCRIPT_URL
-      + '?action=write'
+      + '?action=upsert'
       + '&key=' + encodeURIComponent(SECRET_KEY)
-      + '&data=' + encodeURIComponent(payload);
+      + '&entry=' + encodeURIComponent(JSON.stringify(entry));
     const res = await fetch(url);
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const json = await res.json();
-    if (json.success && json.count !== undefined) {
-      showStatus('✅ נשמרו ' + json.count + ' רשומות לשיטס', 'success');
-    } else if (json.error) {
-      showStatus('❌ שיטס: ' + json.error, 'error');
-    } else {
-      // קיבלנו success אבל בלי count — הנתונים לא נשמרו
-      showStatus('⚠️ הנתונים לא הגיעו לשיטס (URL ארוך מדי?)', 'error');
-    }
+    if (!json.success) throw new Error(json.error || 'שגיאה');
+    return true;
   } catch(err) {
     showStatus('❌ שיטס: ' + err.message, 'error');
+    return false;
+  }
+}
+
+// מחיקת רשומה מהשיטס
+async function deleteEntryFromSheets(id) {
+  if (!SHEETS_SCRIPT_URL) return;
+  try {
+    const url = SHEETS_SCRIPT_URL
+      + '?action=delete'
+      + '&key=' + encodeURIComponent(SECRET_KEY)
+      + '&id=' + encodeURIComponent(id);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'שגיאה');
+  } catch(err) {
+    showStatus('❌ שיטס: ' + err.message, 'error');
+  }
+}
+
+// שמירת כל הרשומות לשיטס (כפתור ידני)
+async function syncToSheets(silent) {
+  if (!SHEETS_SCRIPT_URL) return;
+  if (!silent) showStatus('🔄 שומר לשיטס...', '');
+  let ok = 0;
+  for (const entry of entries) {
+    const success = await syncEntryToSheets(entry);
+    if (success) ok++;
+  }
+  if (!silent || ok < entries.length) {
+    showStatus(ok === entries.length
+      ? '✅ נשמרו ' + ok + ' רשומות לשיטס'
+      : '⚠️ נשמרו ' + ok + ' מתוך ' + entries.length, ok === entries.length ? 'success' : 'error');
   }
 }
 
