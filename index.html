@@ -132,6 +132,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <div class="header-sub" id="headerSub">טוען...</div>
     </div>
     <div class="header-actions">
+      <button class="btn-sync" onclick="loadFromSheets()">📥 טען משיטס</button>
       <button class="btn-sync" onclick="syncToSheets()">🔄 שמור לשיטס</button>
       <button class="btn-add-main" onclick="openModal()">+ הוספה</button>
     </div>
@@ -461,10 +462,32 @@ function deleteEntry() {
   showStatus('נמחק', 'success');
 }
 
+// ---- LOAD FROM SHEETS ----
+async function loadFromSheets() {
+  if (!SHEETS_SCRIPT_URL) return;
+  showStatus('🔄 טוען מגוגל שיטס...', '');
+  try {
+    const res = await fetch(SHEETS_SCRIPT_URL);
+    const json = await res.json();
+    if (json.success && Array.isArray(json.data) && json.data.length > 0) {
+      entries = json.data;
+      saveToStorage();
+      populateMonthFilter();
+      renderList();
+      updateSummary();
+      showStatus('✅ נטען מגוגל שיטס!', 'success');
+    } else {
+      showStatus('אין נתונים בשיטס', '');
+    }
+  } catch(err) {
+    showStatus('❌ שגיאה בטעינה: ' + err.message, 'error');
+  }
+}
+
 // ---- SYNC TO SHEETS ----
 async function syncToSheets() {
   if (!SHEETS_SCRIPT_URL) {
-    alert('⚠️ כתובת ה-Apps Script אינה מוגדרת.\n\nעקוב אחרי ההוראות ב-README כדי לפרוס את הסקריפט ולהדביק את הכתובת.');
+    alert('⚠️ כתובת ה-Apps Script אינה מוגדרת.');
     return;
   }
   showStatus('🔄 שומר לגוגל שיטס...', '');
@@ -499,6 +522,8 @@ if ('serviceWorker' in navigator) {
 
 // ---- START ----
 init();
+// טעינה אוטומטית מהשיטס אם אין נתונים מקומיים
+if (entries.length === 0 && SHEETS_SCRIPT_URL) loadFromSheets();
 </script>
 </body>
 </html>
