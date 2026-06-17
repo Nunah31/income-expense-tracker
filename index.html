@@ -202,6 +202,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <div class="header-sub" id="headerSub">טוען...</div>
     </div>
     <div class="header-actions">
+      <button class="btn-sync" onclick="pushToSheets()">📤 שמור לשיטס</button>
       <button class="btn-sync" onclick="mergeWithSheets()">🔀 מיזוג שיטס</button>
       <button class="btn-sync" id="btnSync" onclick="manualSync()">☁️ סנכרון</button>
       <button class="btn-sync" onclick="showGhSetup()" title="הגדרת טוקן" style="padding:9px 10px;">⚙️</button>
@@ -899,6 +900,26 @@ function showStatus(msg, type) {
   clearTimeout(el._timer);
   const duration = type === 'error' ? 10000 : 3000; // שגיאות — 10 שניות
   el._timer = setTimeout(() => { el.classList.remove('show'); }, duration);
+}
+
+// ---- PUSH ALL TO SHEETS ----
+async function pushToSheets() {
+  if (!SHEETS_SCRIPT_URL) return;
+  showStatus('📤 שומר לשיטס...', '');
+  let ok = 0;
+  for (const entry of entries) {
+    try {
+      const url = SHEETS_SCRIPT_URL
+        + '?action=upsert'
+        + '&key=' + encodeURIComponent(SECRET_KEY)
+        + '&entry=' + encodeURIComponent(JSON.stringify(entry));
+      const r = await fetch(url);
+      if (r.ok) ok++;
+    } catch {}
+  }
+  showStatus(ok === entries.length
+    ? '✅ נשמר לשיטס (' + ok + ' רשומות)'
+    : '⚠️ נשמרו ' + ok + ' מתוך ' + entries.length, ok === entries.length ? 'success' : 'error');
 }
 
 // ---- MERGE WITH SHEETS ----
