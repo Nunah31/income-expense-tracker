@@ -202,6 +202,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <div class="header-sub" id="headerSub">טוען...</div>
     </div>
     <div class="header-actions">
+      <button class="btn-sync" onclick="mergeWithSheets()">🔀 מיזוג שיטס</button>
       <button class="btn-sync" id="btnSync" onclick="manualSync()">☁️ סנכרון</button>
       <button class="btn-sync" onclick="showGhSetup()" title="הגדרת טוקן" style="padding:9px 10px;">⚙️</button>
       <button class="btn-add-main" onclick="openModal()">+ הוספה</button>
@@ -866,6 +867,67 @@ function showStatus(msg, type) {
   clearTimeout(el._timer);
   const duration = type === 'error' ? 10000 : 3000; // שגיאות — 10 שניות
   el._timer = setTimeout(() => { el.classList.remove('show'); }, duration);
+}
+
+// ---- MERGE WITH SHEETS ----
+async function mergeWithSheets() {
+  if (!SHEETS_SCRIPT_URL) return;
+  showStatus('🔀 קורא מהשיטס...', '');
+  try {
+    const url = SHEETS_SCRIPT_URL + '?action=read_sheet&key=' + encodeURIComponent(SECRET_KEY);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const json = await res.json();
+    if (!json.success) throw new Error(json.error || 'שגיאה');
+
+    const sheetsEntries = json.data || [];
+    if (sheetsEntries.length === 0) {
+      showStatus('השיטס ריק — אין מה למזג', '');
+      return;
+    }
+
+    const merged = [...entries];
+    let added = 0, updated = 0;
+
+    for (const se of sheetsEntries) {
+      if (!se.name) continue;
+      // התאמה לפי סוג + שם + תאריך ביצוע
+      const matchIdx = merged.findIndex(le =>
+        le.type === se.type &&
+        le.name.trim() === se.name.trim() &&
+        (le.execDate || '') === (se.execDate || '')
+      );
+      if (matchIdx >= 0) {
+        // קיים — עדכן שדות שאודי ערך בשיטס (השיטס גובר)
+        merged[matchIdx] = {
+          ...merged[matchIdx],
+          payDate:  se.payDate  || merged[matchIdx].payDate,
+          amount:   se.amount   || merged[matchIdx].amount,
+          notes:    se.notes    || merged[matchIdx].notes,
+          status:   se.status   || merged[matchIdx].status,
+          paidDate: se.paidDate || merged[matchIdx].paidDate,
+        };
+        updated++;
+      } else {
+        // חדש — אודי הוסיף בשיטס
+        merged.push({ ...se, id: Date.now().toString() + Math.random().toString(36).slice(2) });
+        added++;
+      }
+    }
+
+    entries = merged;
+    saveToStorage();
+    populateMonthFilter();
+    renderList();
+    updateSummary();
+
+    // שמור את המיזוג חזרה לשיטס ול-GitHub
+    scheduleGhSync();
+
+    showStatus(`✅ מוזג: ${added} חדשות, ${updated} עודכנו`, 'success');
+  } catch(err) {
+    showStatus('❌ מיזוג: ' + err.message, 'error');
+  }
 }
 
 // ---- GITHUB SYNC ----

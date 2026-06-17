@@ -43,7 +43,13 @@ function doGet(e) {
       return buildResponse({ success: true, count: entries.length }, cb);
     }
 
-    // read (ברירת מחדל): קריאת כל הרשומות
+    // read_sheet: קריאה ישירה מתאי הגיליון (כולל עריכות ידניות)
+    if (action === 'read_sheet') {
+      const data = readFromSheet();
+      return buildResponse({ success: true, data: data }, cb);
+    }
+
+    // read (ברירת מחדל): קריאת כל הרשומות מה-Properties
     const data = readAllEntries();
     return buildResponse({ success: true, data: data }, cb);
 
