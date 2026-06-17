@@ -231,10 +231,18 @@ function rebuildSheet() {
   }
 
   // ---- רוחב עמודות ----
-  sheet.setColumnWidth(INC_START,     160); // שם הכנסה
-  sheet.setColumnWidth(INC_START + 4, 200); // הערות הכנסה
-  sheet.setColumnWidth(EXP_START,     140); // שם הוצאה
-  sheet.setColumnWidth(EXP_START + 4, 200); // הערות הוצאה
+  sheet.setColumnWidth(INC_START,     160);
+  sheet.setColumnWidth(INC_START + 4, 200);
+  sheet.setColumnWidth(EXP_START,     140);
+  sheet.setColumnWidth(EXP_START + 4, 200);
+
+  // ---- הקפאת שורות כותרת + פילטרים ----
+  sheet.setFrozenRows(4);
+  // מחק פילטר קיים (אם יש) ואז צור חדש על כל הטווח
+  try { const f = sheet.getFilter(); if (f) f.remove(); } catch(e) {}
+  if (rows > 0) {
+    sheet.getRange(4, INC_START, rows + 1, EXP_START + 6).createFilter();
+  }
 }
 
 function statusLabel(key) {
