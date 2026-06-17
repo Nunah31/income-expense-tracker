@@ -244,6 +244,10 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     </select>
     <input type="text" id="filterSearch" placeholder="חיפוש לפי שם..." oninput="renderList()">
   </div>
+  <div id="filterTotal" style="display:none; background:white; border-radius:12px; padding:10px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.07); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+    <span id="filterTotalLabel" style="font-size:13px; color:#6b7280; font-weight:600;"></span>
+    <span id="filterTotalAmount" style="font-size:18px; font-weight:700;"></span>
+  </div>
 
   <div class="entries" id="entriesList"></div>
 </div>
@@ -429,8 +433,7 @@ function setTab(tab) {
 function populateMonthFilter() {
   const months = new Set();
   entries.forEach(e => {
-    const d = e.execDate || e.payDate;
-    if (d) months.add(d.substring(0, 7));
+    if (e.execDate) months.add(e.execDate.substring(0, 7));
   });
   const sel = document.getElementById('filterMonth');
   const current = sel.value;
@@ -448,18 +451,47 @@ function getFilteredEntries() {
   return entries.filter(e => {
     if (currentTab !== 'all' && e.type !== currentTab) return false;
     if (search && !e.name.toLowerCase().includes(search)) return false;
-    if (month) {
-      const d = e.execDate || e.payDate;
-      if (!d || !d.startsWith(month)) return false;
-    }
+    if (month && (!e.execDate || !e.execDate.startsWith(month))) return false;
     return true;
   });
+}
+
+function updateFilterTotal(filtered) {
+  const month = document.getElementById('filterMonth').value;
+  const search = document.getElementById('filterSearch').value.trim();
+  const el = document.getElementById('filterTotal');
+  const labelEl = document.getElementById('filterTotalLabel');
+  const amountEl = document.getElementById('filterTotalAmount');
+
+  if (!month && !search) { el.style.display = 'none'; return; }
+
+  const total = filtered.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const count = filtered.length;
+
+  let label = '';
+  if (month) {
+    const [y, mo] = month.split('-');
+    const mName = new Date(y, mo - 1).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
+    label = `סה"כ ביצוע ${mName}`;
+  } else {
+    label = `סה"כ "${search}"`;
+  }
+  if (search && month) label += ` + "${search}"`;
+  label += ` (${count} רשומות)`;
+
+  const isExpense = currentTab === 'expense';
+  const isIncome  = currentTab === 'income';
+  labelEl.textContent = label;
+  amountEl.textContent = formatAmount(total);
+  amountEl.style.color = isExpense ? '#dc2626' : isIncome ? '#16a34a' : '#111827';
+  el.style.display = 'flex';
 }
 
 // ---- RENDER ----
 function renderList() {
   const list = document.getElementById('entriesList');
   const filtered = getFilteredEntries();
+  updateFilterTotal(filtered);
 
   if (filtered.length === 0) {
     list.innerHTML = `<div class="empty-state"><div class="icon">${currentTab === 'income' ? '📥' : currentTab === 'expense' ? '📤' : '📊'}</div><p>אין רשומות</p></div>`;
