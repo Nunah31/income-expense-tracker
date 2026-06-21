@@ -465,7 +465,7 @@ function updateFilterTotal(filtered) {
 
   if (!month && !search) { el.style.display = 'none'; return; }
 
-  const total = filtered.reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const total = filtered.reduce((s, e) => s + effectiveAmount(e), 0);
   const count = filtered.length;
 
   let label = '';
@@ -524,7 +524,7 @@ function renderList() {
     return `<div class="entry-card ${e.type} ${e.status==='unpaid'?'unpaid':''}" onclick="openModal('${e.id}')">
       <div class="entry-top">
         <div class="entry-name">${e.name||'(ללא שם)'}</div>
-        <div class="entry-amount">${formatAmount(e.amount)}</div>
+        <div class="entry-amount">${formatAmount(effectiveAmount(e))}</div>
       </div>
       <div class="entry-meta">
         ${execStr ? `<div class="entry-date">ביצוע: <span>${execStr}</span></div>` : ''}
@@ -615,9 +615,15 @@ function formatBankAmount(n) {
 }
 
 // ---- SUMMARY ----
+function isFullyPaid(status) {
+  return status === 'paid' || status === 'paid_bit' || status === 'paid_paybox' || status === 'paid_transfer';
+}
+function effectiveAmount(e) {
+  return isFullyPaid(e.status) ? 0 : (Number(e.amount) || 0);
+}
 function updateSummary() {
-  const income = entries.filter(e => e.type === 'income').reduce((s, e) => s + (Number(e.amount) || 0), 0);
-  const expense = entries.filter(e => e.type === 'expense').reduce((s, e) => s + (Number(e.amount) || 0), 0);
+  const income = entries.filter(e => e.type === 'income').reduce((s, e) => s + effectiveAmount(e), 0);
+  const expense = entries.filter(e => e.type === 'expense').reduce((s, e) => s + effectiveAmount(e), 0);
   document.getElementById('totalIncome').textContent = formatAmount(income);
   document.getElementById('totalExpense').textContent = formatAmount(expense);
 
