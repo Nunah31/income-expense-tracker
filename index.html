@@ -159,7 +159,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
   <div style="background:white; border-radius:20px; padding:28px 32px; width:320px; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
     <div style="font-size:14px; color:#374151; margin-bottom:6px; font-weight:600;">GitHub Personal Access Token</div>
     <div style="font-size:12px; color:#6b7280; margin-bottom:14px;">יוזן פעם אחת ויישמר במכשיר שלך</div>
-    <input id="ghTokenInput" type="password" placeholder="ghp_..."
+    <input id="ghTokenInput" type="password" autocomplete="off" placeholder="ghp_..."
       style="width:100%; border:2px solid #d1d5db; border-radius:10px; padding:12px; font-size:14px; font-family:monospace; outline:none; margin-bottom:10px;"
       onfocus="this.style.borderColor='#1d4ed8'" onblur="this.style.borderColor='#d1d5db'">
     <div id="ghSetupError" style="color:#dc2626; font-size:12px; margin-bottom:10px; display:none;"></div>
@@ -180,7 +180,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
   <div style="color:white; font-size:26px; font-weight:700;">הכנסות והוצאות</div>
   <div style="background:white; border-radius:20px; padding:28px 32px; width:300px; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
     <div style="font-size:15px; color:#6b7280; margin-bottom:16px; font-weight:600;">הזיני קוד כניסה</div>
-    <input id="pinInput" type="password" inputmode="numeric" maxlength="10"
+    <input id="pinInput" type="password" autocomplete="off" inputmode="numeric" maxlength="10"
       style="width:100%; border:2px solid #d1d5db; border-radius:12px; padding:14px; font-size:22px; text-align:center; letter-spacing:6px; font-family:inherit; outline:none;"
       placeholder="••••"
       onkeydown="if(event.key==='Enter') checkPin()"
@@ -600,6 +600,8 @@ function stopEditBank() {
   document.getElementById('bankBalance').style.display = 'none';
   document.getElementById('bankDisplay').style.display = 'block';
   updateSummary();
+  localStorage.setItem('finance_savedAt', new Date().toISOString());
+  scheduleGhSync();
 }
 function loadBankBalance() {
   const saved = localStorage.getItem('bankBalance');
@@ -790,6 +792,7 @@ function checkPin() {
   if (val === APP_PIN) {
     sessionStorage.setItem('auth', '1');
     document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('pinInput').value = '';
     afterLogin();
   } else {
     const err = document.getElementById('pinError');
@@ -950,14 +953,15 @@ async function mergeWithSheets() {
         (le.execDate || '') === (se.execDate || '')
       );
       if (matchIdx >= 0) {
-        // קיים — עדכן שדות שאודי ערך בשיטס (השיטס גובר)
+        // קיים בשניהם — האפליקציה גוברת (מונע דריסת עדכונים טריים ע"י נתונים ישנים מהשיטס)
+        // משלימים מהשיטס רק שדות שריקים באפליקציה
+        const le = merged[matchIdx];
         merged[matchIdx] = {
-          ...merged[matchIdx],
-          payDate:  se.payDate  || merged[matchIdx].payDate,
-          amount:   se.amount   || merged[matchIdx].amount,
-          notes:    se.notes    || merged[matchIdx].notes,
-          status:   se.status   || merged[matchIdx].status,
-          paidDate: se.paidDate || merged[matchIdx].paidDate,
+          ...le,
+          payDate:  le.payDate  || se.payDate,
+          amount:   le.amount   || se.amount,
+          notes:    le.notes    || se.notes,
+          paidDate: le.paidDate || se.paidDate,
         };
         updated++;
       } else {
@@ -997,6 +1001,7 @@ function saveGhToken() {
     return;
   }
   localStorage.setItem('gh_token', val);
+  document.getElementById('ghTokenInput').value = '';
   document.getElementById('ghSetup').style.display = 'none';
   startApp();
 }
