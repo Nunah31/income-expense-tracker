@@ -243,6 +243,13 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <option value="">כל החודשים</option>
     </select>
     <input type="text" id="filterSearch" placeholder="חיפוש לפי שם..." oninput="renderList()">
+    <select id="sortBy" onchange="renderList()">
+      <option value="default">מיון: ברירת מחדל</option>
+      <option value="name_asc">שם (א-ת)</option>
+      <option value="name_desc">שם (ת-א)</option>
+      <option value="exec_asc">תאריך ביצוע (ישן-חדש)</option>
+      <option value="exec_desc">תאריך ביצוע (חדש-ישן)</option>
+    </select>
   </div>
   <div id="filterTotal" style="display:none; background:white; border-radius:12px; padding:10px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.07); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
     <span id="filterTotalLabel" style="font-size:13px; color:#6b7280; font-weight:600;"></span>
@@ -498,12 +505,25 @@ function renderList() {
     return;
   }
 
-  // הוצאות — מיון לפי פרעון מהישן לחדש; שאר — לפי ביצוע מהחדש לישן
-  const sorted = [...filtered].sort((a, b) => {
-    const da = (currentTab === 'expense' ? a.payDate || a.execDate : a.execDate || a.payDate) || '';
-    const db = (currentTab === 'expense' ? b.payDate || b.execDate : b.execDate || b.payDate) || '';
-    return currentTab === 'expense' ? da.localeCompare(db) : db.localeCompare(da);
-  });
+  // מיון
+  const sortBy = document.getElementById('sortBy').value;
+  let sorted;
+  if (sortBy === 'name_asc') {
+    sorted = [...filtered].sort((a, b) => (a.name||'').localeCompare(b.name||'', 'he'));
+  } else if (sortBy === 'name_desc') {
+    sorted = [...filtered].sort((a, b) => (b.name||'').localeCompare(a.name||'', 'he'));
+  } else if (sortBy === 'exec_asc') {
+    sorted = [...filtered].sort((a, b) => (a.execDate||'').localeCompare(b.execDate||''));
+  } else if (sortBy === 'exec_desc') {
+    sorted = [...filtered].sort((a, b) => (b.execDate||'').localeCompare(a.execDate||''));
+  } else {
+    // ברירת מחדל — הוצאות לפי פרעון מהישן לחדש; שאר לפי ביצוע מהחדש לישן
+    sorted = [...filtered].sort((a, b) => {
+      const da = (currentTab === 'expense' ? a.payDate || a.execDate : a.execDate || a.payDate) || '';
+      const db = (currentTab === 'expense' ? b.payDate || b.execDate : b.execDate || b.payDate) || '';
+      return currentTab === 'expense' ? da.localeCompare(db) : db.localeCompare(da);
+    });
+  }
 
   list.innerHTML = sorted.map(e => {
     const statusBadge = statusBadgeHtml(e.status);
