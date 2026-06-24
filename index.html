@@ -972,12 +972,15 @@ async function mergeWithSheets() {
 
     for (const se of sheetsEntries) {
       if (!se.name) continue;
-      // התאמה לפי סוג + שם + תאריך ביצוע
-      const matchIdx = merged.findIndex(le =>
-        le.type === se.type &&
-        le.name.trim() === se.name.trim() &&
-        (le.execDate || '') === (se.execDate || '')
-      );
+      // התאמה לפי ID (אם קיים בשתי הרשומות) — אמין; אחרת לפי סוג+שם+ת.ביצוע (רשומות ישנות בלי ID)
+      let matchIdx = se.id ? merged.findIndex(le => le.id === se.id) : -1;
+      if (matchIdx < 0) {
+        matchIdx = merged.findIndex(le =>
+          le.type === se.type &&
+          le.name.trim() === se.name.trim() &&
+          (le.execDate || '') === (se.execDate || '')
+        );
+      }
       if (matchIdx >= 0) {
         // קיים בשניהם — האפליקציה גוברת (מונע דריסת עדכונים טריים ע"י נתונים ישנים מהשיטס)
         // משלימים מהשיטס רק שדות שריקים באפליקציה
@@ -991,8 +994,8 @@ async function mergeWithSheets() {
         };
         updated++;
       } else {
-        // חדש — אודי הוסיף בשיטס
-        merged.push({ ...se, id: Date.now().toString() + Math.random().toString(36).slice(2) });
+        // חדש — אודי הוסיף בשיטס; שומרים את ה-ID שהשיטס נתן לו כדי שמיזוגים עתידיים יתאימו נכון
+        merged.push({ ...se, id: se.id || (Date.now().toString() + Math.random().toString(36).slice(2)) });
         added++;
       }
     }

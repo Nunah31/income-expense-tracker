@@ -5,8 +5,8 @@ const SECRET_KEY    = 'esther-udi-2025';
 const INCOME_SHEET  = 'הכנסות';
 const EXPENSE_SHEET = 'הוצאות';
 
-const INCOME_HEADERS  = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'הערות', 'סטטוס', 'ת.תשלום'];
-const EXPENSE_HEADERS = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'הערות', 'סטטוס', 'ת.תשלום'];
+const INCOME_HEADERS  = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'הערות', 'סטטוס', 'ת.תשלום', 'ID'];
+const EXPENSE_HEADERS = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'הערות', 'סטטוס', 'ת.תשלום', 'ID'];
 
 const GREEN_DARK  = '#1e7e34';
 const GREEN_LIGHT = '#c6efce';
@@ -24,6 +24,9 @@ function doGet(e) {
 
   try {
     const action = e.parameter.action || '';
+
+    // לפני כל פעולה — קולטים שינויים שאודי עשה ישירות בגיליון, כדי לא לדרוס אותם
+    pullSheetEdits();
 
     if (action === 'upsert' && e.parameter.entry) {
       const entry = JSON.parse(e.parameter.entry);
@@ -52,7 +55,13 @@ function doGet(e) {
     }
 
     if (action === 'read_sheet') {
-      return buildResponse({ success: true, data: readFromSheets() }, cb);
+      return buildResponse({ success: true, data: readAllEntries() }, cb);
+    }
+
+    if (action === 'dedupe') {
+      const removed = dedupeEntries();
+      rebuildSheets();
+      return buildResponse({ success: true, removed: removed }, cb);
     }
 
     // ברירת מחדל: קריאה
@@ -72,6 +81,7 @@ function readAllEntries() {
   return entries.length > 0 ? entries : readFromSheets();
 }
 
+// קוראים ישירות מהגיליון, כולל עמודת ID (8) — שורות בלי ID מקבלות ID חדש
 function readFromSheets() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const entries = [];
@@ -83,11 +93,16 @@ function readFromSheets() {
     if (!sheet) return;
     const lastRow = sheet.getLastRow();
     if (lastRow < 2) return;
-    const data = sheet.getRange(2, 1, lastRow - 1, 7).getValues();
+    const data = sheet.getRange(2, 1, lastRow - 1, 8).getValues();
     data.forEach((row, i) => {
       if (!row[0]) return;
+      let id = row[7] ? String(row[7]) : '';
+      if (!id) {
+        id = (name === INCOME_SHEET ? 'inc_' : 'exp_') + Date.now() + '_' + i;
+        sheet.getRange(i + 2, 8).setValue(id);
+      }
       entries.push({
-        id: name === INCOME_SHEET ? 'inc_' + i : 'exp_' + i,
+        id: id,
         type: name === INCOME_SHEET ? 'income' : 'expense',
         name:     row[0],
         execDate: fmtDate(row[1]),
@@ -100,6 +115,41 @@ function readFromSheets() {
     });
   });
   return entries;
+}
+
+// מעדכן את Properties עם שינויים שנעשו ישירות בגיליון (שורות חדשות / ID קיים שהשתנה)
+// כך שאף עדכון מהאפליקציה לא ידרוס עריכה ידנית של אודי בגיליון
+function pullSheetEdits() {
+  const props = PropertiesService.getScriptProperties();
+  const sheetEntries = readFromSheets();
+  sheetEntries.forEach(se => {
+    const key = 'entry_' + se.id;
+    const existing = props.getProperty(key);
+    if (!existing || JSON.stringify(JSON.parse(existing)) !== JSON.stringify(se)) {
+      props.setProperty(key, JSON.stringify(se));
+    }
+  });
+}
+
+// מסיר כפילויות (אותו סוג+שם+ת.ביצוע+סכום) — משאיר רשומה אחת לכל צירוף
+function dedupeEntries() {
+  const props = PropertiesService.getScriptProperties();
+  const all = Object.keys(props.getProperties())
+    .filter(k => k.startsWith('entry_'))
+    .map(k => ({ key: k, entry: JSON.parse(props.getProperty(k)) }));
+
+  const seen = {};
+  let removed = 0;
+  all.forEach(({ key, entry }) => {
+    const sig = [entry.type, (entry.name||'').trim(), entry.execDate||'', entry.amount||0].join('|');
+    if (seen[sig]) {
+      props.deleteProperty(key);
+      removed++;
+    } else {
+      seen[sig] = true;
+    }
+  });
+  return removed;
 }
 
 // -------------------------------------------------------
@@ -126,9 +176,6 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
 
   const headers = sheetName === INCOME_SHEET ? INCOME_HEADERS : EXPENSE_HEADERS;
 
-  // כותרת ראשית (שורה 1)
-  // אין שורה ראשית נפרדת — הכותרות ישירות בשורה 1
-
   // כותרות עמודות — שורה 1
   const headerRange = sheet.getRange(1, 1, 1, headers.length);
   headerRange.setValues([headers])
@@ -147,12 +194,13 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
       e.notes   || '',
       statusLabel(e.status),
       e.paidDate  ? new Date(e.paidDate)  : '',
+      e.id      || '',
     ]);
-    sheet.getRange(2, 1, rows.length, 7).setValues(rows);
+    sheet.getRange(2, 1, rows.length, 8).setValues(rows);
 
     // עיצוב שורות
     for (let i = 0; i < rows.length; i++) {
-      sheet.getRange(i + 2, 1, 1, 7).setBackground(i % 2 === 0 ? rowColor : WHITE);
+      sheet.getRange(i + 2, 1, 1, 8).setBackground(i % 2 === 0 ? rowColor : WHITE);
     }
 
     // פורמטים
@@ -171,12 +219,13 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
   sheet.setColumnWidth(5, 220); // הערות
   sheet.setColumnWidth(6, 120); // סטטוס
   sheet.setColumnWidth(7, 110); // ת.תשלום
+  sheet.setColumnWidth(8, 1);   // ID — מוסתר (נדרש לסנכרון, אין למחוק/לערוך)
 
   // הקפא שורת כותרת + פילטר
   sheet.setFrozenRows(1);
   try { const f = sheet.getFilter(); if (f) f.remove(); } catch(e) {}
   if (entries.length > 0) {
-    sheet.getRange(1, 1, entries.length + 1, 7).createFilter();
+    sheet.getRange(1, 1, entries.length + 1, 8).createFilter();
   }
 }
 
