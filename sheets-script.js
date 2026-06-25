@@ -190,10 +190,16 @@ function rebuildSheets() {
     .filter(k => k.startsWith('entry_'))
     .map(k => JSON.parse(props[k]));
 
-  writeTab(all.filter(e => e.type === 'income'),  INCOME_SHEET,
-           GREEN_DARK, GREEN_LIGHT, GREEN_ROW);
-  writeTab(all.filter(e => e.type === 'expense'), EXPENSE_SHEET,
-           RED_DARK,   RED_LIGHT,   RED_ROW);
+  try {
+    writeTab(all.filter(e => e.type === 'income'), INCOME_SHEET, GREEN_DARK, GREEN_LIGHT, GREEN_ROW);
+  } catch (err) {
+    console.error('כשל בכתיבת לשונית הכנסות: ' + err.message);
+  }
+  try {
+    writeTab(all.filter(e => e.type === 'expense'), EXPENSE_SHEET, RED_DARK, RED_LIGHT, RED_ROW);
+  } catch (err) {
+    console.error('כשל בכתיבת לשונית הוצאות: ' + err.message);
+  }
 }
 
 function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
@@ -256,11 +262,22 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
   sheet.setColumnWidth(7, 110); // ת.תשלום
   sheet.setColumnWidth(8, 1);   // ID — מוסתר (נדרש לסנכרון, אין למחוק/לערוך)
 
-  // הקפא שורות כותרת (+ בלוק סיכום אם יש) + פילטר
+  // הקפא שורות כותרת (+ בלוק סיכום אם יש)
   sheet.setFrozenRows(hRow);
-  try { const f = sheet.getFilter(); if (f) f.remove(); } catch(e) {}
-  if (entries.length > 0) {
-    sheet.getRange(hRow, 1, entries.length + 1, 8).createFilter();
+
+  // פילטר — לעדכן טווח של פילטר קיים במקום להסיר וליצור מחדש (מונע שגיאת "כבר קיים מסנן"
+  // שהייתה קורסת את כל הריבנילד ומשאירה את הגיליון/הזיכרון לא מסונכרנים)
+  try {
+    const existingFilter = sheet.getFilter();
+    if (entries.length > 0) {
+      const range = sheet.getRange(hRow, 1, entries.length + 1, 8);
+      if (existingFilter) existingFilter.setRange(range);
+      else range.createFilter();
+    } else if (existingFilter) {
+      existingFilter.remove();
+    }
+  } catch (filterErr) {
+    // בעיית פילטר לא קריטית — לא עוצרים בגללה את כתיבת הנתונים בשאר הלשוניות
   }
 }
 
