@@ -1000,6 +1000,20 @@ async function mergeWithSheets() {
       }
     }
 
+    // מחיקות — שורות שאודי מחק בשיטס נמחקות גם באפליקציה
+    // (בטוח לעשות זאת כי כל שינוי באפליקציה נשלח אוטומטית לשיטס, אז מזהה שלא מופיע בשיטס = נמחק שם)
+    let deleted = 0;
+    ['income', 'expense'].forEach(type => {
+      const sheetIdsForType = new Set(sheetsEntries.filter(se => se.type === type && se.id).map(se => se.id));
+      if (sheetIdsForType.size === 0) return; // הגנה — לא למחוק אם לא התקבלו נתונים לסוג הזה
+      for (let i = merged.length - 1; i >= 0; i--) {
+        if (merged[i].type === type && merged[i].id && !sheetIdsForType.has(merged[i].id)) {
+          merged.splice(i, 1);
+          deleted++;
+        }
+      }
+    });
+
     entries = merged;
     saveToStorage();
     populateMonthFilter();
@@ -1009,7 +1023,7 @@ async function mergeWithSheets() {
     // שמור את המיזוג חזרה לשיטס ול-GitHub
     scheduleGhSync();
 
-    showStatus(`✅ מוזג: ${added} חדשות, ${updated} עודכנו`, 'success');
+    showStatus(`✅ מוזג: ${added} חדשות, ${updated} עודכנו, ${deleted} נמחקו`, 'success');
   } catch(err) {
     showStatus('❌ מיזוג: ' + err.message, 'error');
   }
