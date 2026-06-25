@@ -25,6 +25,11 @@ function doGet(e) {
   try {
     const action = e.parameter.action || '';
 
+    if (action === 'reset_from_sheet') {
+      const count = resetPropertiesFromSheet();
+      return buildResponse({ success: true, count: count }, cb);
+    }
+
     // לפני כל פעולה — קולטים שינויים שאודי עשה ישירות בגיליון, כדי לא לדרוס אותם
     pullSheetEdits();
 
@@ -129,6 +134,20 @@ function pullSheetEdits() {
       props.setProperty(key, JSON.stringify(se));
     }
   });
+}
+
+// מאפס לחלוטין את הזיכרון הפנימי (Properties) ובונה אותו מחדש אך ורק לפי מה שכרגע בגיליון —
+// שימוש חד-פעמי אחרי שחזור גרסה בגיליון, כדי למחוק שאריות ישנות/כפולות שנשארו בזיכרון
+function resetPropertiesFromSheet() {
+  const props = PropertiesService.getScriptProperties();
+  Object.keys(props.getProperties())
+    .filter(k => k.startsWith('entry_'))
+    .forEach(k => props.deleteProperty(k));
+
+  const sheetEntries = readFromSheets();
+  sheetEntries.forEach(se => props.setProperty('entry_' + se.id, JSON.stringify(se)));
+  rebuildSheets();
+  return sheetEntries.length;
 }
 
 // מסיר כפילויות (אותו סוג+שם+ת.ביצוע+סכום) — משאיר רשומה אחת לכל צירוף
