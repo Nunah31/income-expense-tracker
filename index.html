@@ -61,10 +61,12 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .entry-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.12); }
 .entry-card.income { border-right-color: #16a34a; }
 .entry-card.expense { border-right-color: #dc2626; }
-.entry-card.unpaid { opacity: 0.7; }
+.entry-card.is-paid { opacity: 0.7; }
 .entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.entry-name { font-size: 16px; font-weight: 700; color: #111827; }
-.entry-amount { font-size: 18px; font-weight: 700; white-space: nowrap; }
+.entry-name { font-size: 16px; font-weight: 400; color: #111827; }
+.entry-card:not(.is-paid) .entry-name { font-weight: 700; }
+.entry-amount { font-size: 18px; font-weight: 400; white-space: nowrap; }
+.entry-card:not(.is-paid) .entry-amount { font-weight: 700; }
 .entry-card.income .entry-amount { color: #16a34a; }
 .entry-card.expense .entry-amount { color: #dc2626; }
 .entry-meta { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
@@ -541,7 +543,7 @@ function renderList() {
           onchange="quickSave('${e.id}','paidDate',this.value)">
       </div>` : '';
 
-    return `<div class="entry-card ${e.type} ${e.status==='unpaid'?'unpaid':''}" onclick="openModal('${e.id}')">
+    return `<div class="entry-card ${e.type} ${isFullyPaid(e.status)?'is-paid':''}" onclick="openModal('${e.id}')">
       <div class="entry-top">
         <div class="entry-name">${e.name||'(ללא שם)'}</div>
         <div class="entry-amount">${formatAmount(effectiveAmount(e))}</div>
