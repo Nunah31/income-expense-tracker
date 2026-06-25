@@ -986,6 +986,7 @@ async function mergeWithSheets() {
       if (!se.name) continue;
       // התאמה לפי ID (אם קיים בשתי הרשומות) — אמין; אחרת לפי סוג+שם+ת.ביצוע (רשומות ישנות בלי ID),
       // ורק אם הרשומה הזו עדיין לא "נתפסה" ע"י שורה אחרת מהשיטס באותו מיזוג
+      const matchedById = !!se.id && merged.findIndex(le => le.id === se.id) >= 0;
       let matchIdx = se.id ? merged.findIndex(le => le.id === se.id) : -1;
       if (matchIdx < 0) {
         matchIdx = merged.findIndex(le =>
@@ -999,9 +1000,11 @@ async function mergeWithSheets() {
         claimedIds.add(merged[matchIdx].id);
         // קיים בשניהם — האפליקציה גוברת (מונע דריסת עדכונים טריים ע"י נתונים ישנים מהשיטס)
         // משלימים מהשיטס רק שדות שריקים באפליקציה
+        // את השם מעדכנים מהשיטס כשההתאמה היא לפי ID (אמינה) — כך שינוי שם שאודי עשה בשיטס ישתקף
         const le = merged[matchIdx];
         merged[matchIdx] = {
           ...le,
+          name:     matchedById ? (se.name || le.name) : le.name,
           payDate:  le.payDate  || se.payDate,
           amount:   le.amount   || se.amount,
           notes:    le.notes    || se.notes,
