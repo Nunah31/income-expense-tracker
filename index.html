@@ -62,31 +62,37 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .selection-bar .sel-sum { font-size: 19px; font-weight: 700; }
 .selection-bar button { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; padding: 6px 12px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 
-/* ---- ENTRIES LIST ---- */
-.entries { display: flex; flex-direction: column; gap: 8px; }
-.entry-card { background: white; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-right: 4px solid transparent; cursor: pointer; transition: box-shadow 0.15s; display: flex; gap: 10px; align-items: flex-start; }
-.entry-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.12); }
-.entry-card.income { border-right-color: #16a34a; }
-.entry-card.expense { border-right-color: #dc2626; }
-.entry-card.is-paid { opacity: 0.65; }
-.entry-check { width: 24px; height: 24px; flex-shrink: 0; margin-top: 4px; cursor: pointer; accent-color: #16a34a; }
-.entry-body { flex: 1; min-width: 0; }
-.entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.entry-name { font-size: 18px; font-weight: 400; color: #111827; }
-.entry-card:not(.is-paid) .entry-name { font-weight: 700; }
-.entry-amount { font-size: 20px; font-weight: 400; white-space: nowrap; }
-.entry-card:not(.is-paid) .entry-amount { font-weight: 700; }
-.entry-card.income .entry-amount { color: #16a34a; }
-.entry-card.expense .entry-amount { color: #dc2626; }
-.entry-meta { display: flex; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
-.entry-date { font-size: 14px; color: #111827; font-weight: 500; }
-.entry-date span { color: #111827; font-weight: 700; }
-.entry-notes { font-size: 16px; color: #111827; margin-top: 6px; font-style: normal; font-weight: 500; }
-.entry-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-.badge { font-size: 13px; font-weight: 600; padding: 4px 9px; border-radius: 99px; }
+/* ---- ENTRIES LIST (טבלאי) ---- */
+.entries { display: flex; flex-direction: column; gap: 4px; background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; padding: 4px; }
+.entries-header { display: grid; grid-template-columns: 26px 1fr 78px 78px 92px; gap: 8px; padding: 8px 12px; font-size: 12px; font-weight: 700; color: #6b7280; background: white; border-radius: 12px 12px 0 0; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: -1px; }
+.entries-header span:nth-child(3), .entries-header span:nth-child(4), .entries-header span:nth-child(5) { text-align: center; }
+.entry-row { border-radius: 10px; border-right: 4px solid transparent; cursor: pointer; transition: background 0.15s; padding: 8px 10px; }
+.entry-row:hover { background: #f9fafb; }
+.entry-row.income { border-right-color: #16a34a; }
+.entry-row.expense { border-right-color: #dc2626; }
+.entry-row.is-paid { opacity: 0.6; }
+.entry-row + .entry-row { border-top: 1px solid #f1f5f9; }
+.entry-main { display: grid; grid-template-columns: 26px 1fr 78px 78px 92px; gap: 8px; align-items: center; }
+.entry-check { width: 22px; height: 22px; cursor: pointer; accent-color: #16a34a; }
+.entry-name { font-size: 17px; font-weight: 400; color: #111827; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.entry-row:not(.is-paid) .entry-name { font-weight: 700; }
+.entry-col-date { font-size: 13px; color: #374151; text-align: center; white-space: nowrap; }
+.entry-amount { font-size: 18px; font-weight: 400; white-space: nowrap; text-align: left; }
+.entry-row:not(.is-paid) .entry-amount { font-weight: 700; }
+.entry-row.income .entry-amount { color: #16a34a; }
+.entry-row.expense .entry-amount { color: #dc2626; }
+.entry-sub { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 6px; padding-right: 34px; }
+.entry-notes { font-size: 14px; color: #6b7280; font-weight: 500; }
+.badge { font-size: 12px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
 .badge-paid { background: #dcfce7; color: #15803d; }
 .badge-unpaid { background: #fee2e2; color: #dc2626; }
 .badge-partial { background: #fef3c7; color: #b45309; }
+@media (max-width: 480px) {
+  .entries-header, .entry-main { grid-template-columns: 22px 1fr 64px 64px 78px; gap: 5px; }
+  .entry-name { font-size: 16px; }
+  .entry-amount { font-size: 16px; }
+  .entry-col-date { font-size: 12px; }
+}
 
 .empty-state { text-align: center; padding: 40px 20px; color: #9ca3af; }
 .empty-state .icon { font-size: 48px; margin-bottom: 12px; }
@@ -272,6 +278,9 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     <button onclick="clearSelection()">נקה בחירה ✕</button>
   </div>
 
+  <div class="entries-header" id="entriesHeader" style="display:none;">
+    <span></span><span>שם</span><span>ביצוע</span><span>פרעון</span><span>סה"כ</span>
+  </div>
   <div class="entries" id="entriesList"></div>
 </div>
 
@@ -539,9 +548,11 @@ function renderList() {
   updateSelectionBar();
 
   if (filtered.length === 0) {
+    document.getElementById('entriesHeader').style.display = 'none';
     list.innerHTML = `<div class="empty-state"><div class="icon">${currentTab === 'income' ? '📥' : currentTab === 'expense' ? '📤' : '📊'}</div><p>אין רשומות</p></div>`;
     return;
   }
+  document.getElementById('entriesHeader').style.display = 'grid';
 
   // מיון
   const sortBy = document.getElementById('sortBy').value;
@@ -579,24 +590,19 @@ function renderList() {
           onchange="quickSave('${e.id}','paidDate',this.value)">
       </div>` : '';
 
-    return `<div class="entry-card ${e.type} ${isFullyPaid(e.status)?'is-paid':''}" onclick="openModal('${e.id}')">
-      <input type="checkbox" class="entry-check" ${selectedIds.has(e.id)?'checked':''} onclick="event.stopPropagation(); toggleSelect('${e.id}')">
-      <div class="entry-body">
-        <div class="entry-top">
-          <div class="entry-name">${e.name||'(ללא שם)'}</div>
-          <div class="entry-amount">${formatAmount(effectiveAmount(e))}</div>
-        </div>
-        <div class="entry-meta">
-          ${execStr ? `<div class="entry-date">ביצוע: <span>${execStr}</span></div>` : ''}
-          ${payStr ? `<div class="entry-date">פרעון: <span>${payStr}</span></div>` : ''}
-          ${paidStr ? `<div class="entry-date">שולם: <span>${paidStr}</span></div>` : ''}
-        </div>
-        <div class="entry-badges">${statusBadge}</div>
-        ${e.notes ? `<div class="entry-notes">${e.notes}</div>` : ''}
-        ${isExpense && e.subAmounts && e.subAmounts.length > 1 ? `
-          <div class="sub-amounts-display">
-            ${e.subAmounts.map(s => `<span class="sub-amt-chip">${s.note ? s.note + ': ' : ''}₪${Number(s.value).toLocaleString('he-IL')}</span>`).join('')}
-          </div>` : ''}
+    return `<div class="entry-row ${e.type} ${isFullyPaid(e.status)?'is-paid':''}" onclick="openModal('${e.id}')">
+      <div class="entry-main">
+        <input type="checkbox" class="entry-check" ${selectedIds.has(e.id)?'checked':''} onclick="event.stopPropagation(); toggleSelect('${e.id}')">
+        <div class="entry-name">${e.name||'(ללא שם)'}</div>
+        <div class="entry-col-date">${execStr || '—'}</div>
+        <div class="entry-col-date">${payStr || '—'}</div>
+        <div class="entry-amount">${formatAmount(effectiveAmount(e))}</div>
+      </div>
+      <div class="entry-sub">
+        ${statusBadge}
+        ${paidStr ? `<span class="entry-notes">שולם: ${paidStr}</span>` : ''}
+        ${e.notes ? `<span class="entry-notes">${e.notes}</span>` : ''}
+        ${isExpense && e.subAmounts && e.subAmounts.length > 1 ? e.subAmounts.map(s => `<span class="sub-amt-chip">${s.note ? s.note + ': ' : ''}₪${Number(s.value).toLocaleString('he-IL')}</span>`).join('') : ''}
         ${quickEdit}
       </div>
     </div>`;
