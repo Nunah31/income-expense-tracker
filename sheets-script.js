@@ -264,8 +264,8 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
   }
 }
 
-// בלוק סיכום כספי בראש לשונית ההכנסות — סה"כ הכנסות/הוצאות שלא שולמו, מצב בנק, יתרה כוללת
-// (אותו חישוב כמו באפליקציה: סטטוס "שולם"/"שולם בביט"/"שולם בפייבוקס"/"שולם בהעברה" לא נכלל בסה"כ)
+// בלוק סיכום כספי בראש לשונית ההכנסות — סה"כ הכנסות/הוצאות, מצב בנק, יתרה כוללת
+// (אותו חישוב כמו באפליקציה: בהכנסות סטטוס "שולם"/וכו' לא נכלל בסה"כ; בהוצאות כל הסכומים נכללים גם אחרי תשלום)
 function writeSummaryBlock(sheet) {
   sheet.getRange('A1:B1').merge()
     .setValue('💰 סיכום כספי')
@@ -275,7 +275,7 @@ function writeSummaryBlock(sheet) {
 
   const rows = [
     ['סה"כ הכנסות (שלא שולמו)', '=SUMIF(F8:F,"לא שולם",D8:D)+SUMIF(F8:F,"שולם חלקית",D8:D)'],
-    ['סה"כ הוצאות (שלא שולמו)', `=SUMIF('${EXPENSE_SHEET}'!F2:F,"לא שולם",'${EXPENSE_SHEET}'!D2:D)+SUMIF('${EXPENSE_SHEET}'!F2:F,"שולם חלקית",'${EXPENSE_SHEET}'!D2:D)`],
+    ['סה"כ הוצאות', `=SUM('${EXPENSE_SHEET}'!D2:D)`],
     ['מצב בבנק', Number(PropertiesService.getScriptProperties().getProperty(BANK_PROP)) || 0],
     ['יתרה כוללת', '=B4+B2-B3'],
   ];
