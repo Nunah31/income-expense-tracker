@@ -30,8 +30,8 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 /* ---- SUMMARY BAR ---- */
 .summary { max-width: 700px; margin: 10px auto 0; padding: 0 10px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px; }
 .summary-card { background: white; border-radius: 12px; padding: 10px 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); text-align: center; }
-.summary-card .label { font-size: 13px; color: #374151; margin-bottom: 4px; font-weight: 700; }
-.summary-card .amount { font-size: 16px; font-weight: 700; }
+.summary-card .label { font-size: 14px; color: #374151; margin-bottom: 4px; font-weight: 700; }
+.summary-card .amount { font-size: 18px; font-weight: 700; }
 .card-income .amount { color: #16a34a; }
 .card-expense .amount { color: #dc2626; }
 .card-balance { background: linear-gradient(135deg, #1e3a5f, #1d4ed8); }
@@ -52,29 +52,38 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 
 /* ---- FILTER BAR ---- */
 .filter-bar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; flex-wrap: wrap; }
-.filter-bar select, .filter-bar input[type="text"] { border: 1.5px solid #d1fae5; border-radius: 10px; padding: 8px 12px; font-family: inherit; font-size: 14px; background: white; color: #111827; flex: 1; min-width: 100px; }
+.filter-bar select, .filter-bar input[type="text"] { border: 1.5px solid #d1fae5; border-radius: 10px; padding: 9px 12px; font-family: inherit; font-size: 15px; background: white; color: #111827; flex: 1; min-width: 100px; }
 .filter-bar select:focus, .filter-bar input:focus { outline: none; border-color: #16a34a; }
 
+/* ---- SELECTION BAR ---- */
+.selection-bar { display: none; background: #111827; color: white; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.selection-bar.show { display: flex; }
+.selection-bar .sel-count { font-size: 14px; font-weight: 600; opacity: 0.85; }
+.selection-bar .sel-sum { font-size: 19px; font-weight: 700; }
+.selection-bar button { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; padding: 6px 12px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+
 /* ---- ENTRIES LIST ---- */
-.entries { display: flex; flex-direction: column; gap: 10px; }
-.entry-card { background: white; border-radius: 14px; padding: 14px 16px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-right: 4px solid transparent; cursor: pointer; transition: box-shadow 0.15s; }
+.entries { display: flex; flex-direction: column; gap: 8px; }
+.entry-card { background: white; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); border-right: 4px solid transparent; cursor: pointer; transition: box-shadow 0.15s; display: flex; gap: 10px; align-items: flex-start; }
 .entry-card:hover { box-shadow: 0 3px 12px rgba(0,0,0,0.12); }
 .entry-card.income { border-right-color: #16a34a; }
 .entry-card.expense { border-right-color: #dc2626; }
-.entry-card.is-paid { opacity: 0.7; }
+.entry-card.is-paid { opacity: 0.65; }
+.entry-check { width: 24px; height: 24px; flex-shrink: 0; margin-top: 4px; cursor: pointer; accent-color: #16a34a; }
+.entry-body { flex: 1; min-width: 0; }
 .entry-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.entry-name { font-size: 16px; font-weight: 400; color: #111827; }
+.entry-name { font-size: 18px; font-weight: 400; color: #111827; }
 .entry-card:not(.is-paid) .entry-name { font-weight: 700; }
-.entry-amount { font-size: 18px; font-weight: 400; white-space: nowrap; }
+.entry-amount { font-size: 20px; font-weight: 400; white-space: nowrap; }
 .entry-card:not(.is-paid) .entry-amount { font-weight: 700; }
 .entry-card.income .entry-amount { color: #16a34a; }
 .entry-card.expense .entry-amount { color: #dc2626; }
-.entry-meta { display: flex; gap: 12px; margin-top: 6px; flex-wrap: wrap; }
-.entry-date { font-size: 13px; color: #111827; font-weight: 500; }
+.entry-meta { display: flex; gap: 14px; margin-top: 6px; flex-wrap: wrap; }
+.entry-date { font-size: 14px; color: #111827; font-weight: 500; }
 .entry-date span { color: #111827; font-weight: 700; }
-.entry-notes { font-size: 15px; color: #111827; margin-top: 6px; font-style: normal; font-weight: 500; }
+.entry-notes { font-size: 16px; color: #111827; margin-top: 6px; font-style: normal; font-weight: 500; }
 .entry-badges { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
-.badge { font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 99px; }
+.badge { font-size: 13px; font-weight: 600; padding: 4px 9px; border-radius: 99px; }
 .badge-paid { background: #dcfce7; color: #15803d; }
 .badge-unpaid { background: #fee2e2; color: #dc2626; }
 .badge-partial { background: #fef3c7; color: #b45309; }
@@ -256,6 +265,11 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
   <div id="filterTotal" style="display:none; background:white; border-radius:12px; padding:10px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.07); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
     <span id="filterTotalLabel" style="font-size:13px; color:#6b7280; font-weight:600;"></span>
     <span id="filterTotalAmount" style="font-size:18px; font-weight:700;"></span>
+  </div>
+  <div class="selection-bar" id="selectionBar">
+    <span class="sel-count" id="selectionCount"></span>
+    <span class="sel-sum" id="selectionSum"></span>
+    <button onclick="clearSelection()">נקה בחירה ✕</button>
   </div>
 
   <div class="entries" id="entriesList"></div>
@@ -496,11 +510,33 @@ function updateFilterTotal(filtered) {
   el.style.display = 'flex';
 }
 
+// ---- SELECTION ----
+const selectedIds = new Set();
+function toggleSelect(id) {
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  updateSelectionBar();
+}
+function clearSelection() {
+  selectedIds.clear();
+  renderList();
+}
+function updateSelectionBar() {
+  const bar = document.getElementById('selectionBar');
+  if (selectedIds.size === 0) { bar.classList.remove('show'); return; }
+  const selected = entries.filter(e => selectedIds.has(e.id));
+  const sum = selected.reduce((s, e) => s + effectiveAmount(e), 0);
+  document.getElementById('selectionCount').textContent = `נבחרו ${selectedIds.size} שורות`;
+  document.getElementById('selectionSum').textContent = formatAmount(sum);
+  bar.classList.add('show');
+}
+
 // ---- RENDER ----
 function renderList() {
   const list = document.getElementById('entriesList');
   const filtered = getFilteredEntries();
   updateFilterTotal(filtered);
+  updateSelectionBar();
 
   if (filtered.length === 0) {
     list.innerHTML = `<div class="empty-state"><div class="icon">${currentTab === 'income' ? '📥' : currentTab === 'expense' ? '📤' : '📊'}</div><p>אין רשומות</p></div>`;
@@ -544,22 +580,25 @@ function renderList() {
       </div>` : '';
 
     return `<div class="entry-card ${e.type} ${isFullyPaid(e.status)?'is-paid':''}" onclick="openModal('${e.id}')">
-      <div class="entry-top">
-        <div class="entry-name">${e.name||'(ללא שם)'}</div>
-        <div class="entry-amount">${formatAmount(effectiveAmount(e))}</div>
+      <input type="checkbox" class="entry-check" ${selectedIds.has(e.id)?'checked':''} onclick="event.stopPropagation(); toggleSelect('${e.id}')">
+      <div class="entry-body">
+        <div class="entry-top">
+          <div class="entry-name">${e.name||'(ללא שם)'}</div>
+          <div class="entry-amount">${formatAmount(effectiveAmount(e))}</div>
+        </div>
+        <div class="entry-meta">
+          ${execStr ? `<div class="entry-date">ביצוע: <span>${execStr}</span></div>` : ''}
+          ${payStr ? `<div class="entry-date">פרעון: <span>${payStr}</span></div>` : ''}
+          ${paidStr ? `<div class="entry-date">שולם: <span>${paidStr}</span></div>` : ''}
+        </div>
+        <div class="entry-badges">${statusBadge}</div>
+        ${e.notes ? `<div class="entry-notes">${e.notes}</div>` : ''}
+        ${isExpense && e.subAmounts && e.subAmounts.length > 1 ? `
+          <div class="sub-amounts-display">
+            ${e.subAmounts.map(s => `<span class="sub-amt-chip">${s.note ? s.note + ': ' : ''}₪${Number(s.value).toLocaleString('he-IL')}</span>`).join('')}
+          </div>` : ''}
+        ${quickEdit}
       </div>
-      <div class="entry-meta">
-        ${execStr ? `<div class="entry-date">ביצוע: <span>${execStr}</span></div>` : ''}
-        ${payStr ? `<div class="entry-date">פרעון: <span>${payStr}</span></div>` : ''}
-        ${paidStr ? `<div class="entry-date">שולם: <span>${paidStr}</span></div>` : ''}
-      </div>
-      <div class="entry-badges">${statusBadge}</div>
-      ${e.notes ? `<div class="entry-notes">${e.notes}</div>` : ''}
-      ${isExpense && e.subAmounts && e.subAmounts.length > 1 ? `
-        <div class="sub-amounts-display">
-          ${e.subAmounts.map(s => `<span class="sub-amt-chip">${s.note ? s.note + ': ' : ''}₪${Number(s.value).toLocaleString('he-IL')}</span>`).join('')}
-        </div>` : ''}
-      ${quickEdit}
     </div>`;
   }).join('');
 }
