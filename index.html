@@ -648,6 +648,8 @@ function isFullyPaid(status) {
   return status === 'paid' || status === 'paid_bit' || status === 'paid_paybox' || status === 'paid_transfer';
 }
 function effectiveAmount(e) {
+  // בהוצאות הסכום נשאר מוצג כרגיל גם אחרי "שולם" — נמחק רק כשמוחקים את השורה ידנית
+  if (e.type === 'expense') return Number(e.amount) || 0;
   return isFullyPaid(e.status) ? 0 : (Number(e.amount) || 0);
 }
 function updateSummary() {
