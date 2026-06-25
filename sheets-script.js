@@ -4,9 +4,13 @@
 const SECRET_KEY    = 'esther-udi-2025';
 const INCOME_SHEET  = 'הכנסות';
 const EXPENSE_SHEET = 'הוצאות';
+const BANK_PROP      = 'bankBalance';
 
 const INCOME_HEADERS  = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'הערות', 'סטטוס', 'ת.תשלום', 'ID'];
 const EXPENSE_HEADERS = ['שם', 'ת.ביצוע', 'ת.פרעון', 'סה"כ', 'הערות', 'סטטוס', 'ת.תשלום', 'ID'];
+
+// בלשונית ההכנסות יש בלוק סיכום (5 שורות) מעל הכותרות, ולכן הכותרות שלה זזות שורה 7
+function headerRow(sheetName) { return sheetName === INCOME_SHEET ? 7 : 1; }
 
 const GREEN_DARK  = '#1e7e34';
 const GREEN_LIGHT = '#c6efce';
@@ -15,6 +19,7 @@ const RED_DARK    = '#c0392b';
 const RED_LIGHT   = '#ffc7ce';
 const RED_ROW     = '#fff0f0';
 const WHITE       = '#ffffff';
+const SUMMARY_BG  = '#1e293b';
 
 // -------------------------------------------------------
 function doGet(e) {
@@ -28,6 +33,12 @@ function doGet(e) {
     if (action === 'reset_from_sheet') {
       const count = resetPropertiesFromSheet();
       return buildResponse({ success: true, count: count }, cb);
+    }
+
+    if (action === 'set_bank' && e.parameter.bank !== undefined) {
+      PropertiesService.getScriptProperties().setProperty(BANK_PROP, e.parameter.bank);
+      rebuildSheets();
+      return buildResponse({ success: true }, cb);
     }
 
     // לפני כל פעולה — קולטים שינויים שאודי עשה ישירות בגיליון, כדי לא לדרוס אותם
@@ -96,15 +107,16 @@ function readFromSheets() {
   [INCOME_SHEET, EXPENSE_SHEET].forEach(name => {
     const sheet = ss.getSheetByName(name);
     if (!sheet) return;
+    const hRow = headerRow(name);
     const lastRow = sheet.getLastRow();
-    if (lastRow < 2) return;
-    const data = sheet.getRange(2, 1, lastRow - 1, 8).getValues();
+    if (lastRow < hRow + 1) return;
+    const data = sheet.getRange(hRow + 1, 1, lastRow - hRow, 8).getValues();
     data.forEach((row, i) => {
       if (!row[0]) return;
       let id = row[7] ? String(row[7]) : '';
       if (!id) {
         id = (name === INCOME_SHEET ? 'inc_' : 'exp_') + Date.now() + '_' + i;
-        sheet.getRange(i + 2, 8).setValue(id);
+        sheet.getRange(hRow + 1 + i, 8).setValue(id);
       }
       entries.push({
         id: id,
@@ -193,10 +205,13 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
     sheet.clear();
   }
 
+  const hRow = headerRow(sheetName);
   const headers = sheetName === INCOME_SHEET ? INCOME_HEADERS : EXPENSE_HEADERS;
 
-  // כותרות עמודות — שורה 1
-  const headerRange = sheet.getRange(1, 1, 1, headers.length);
+  if (sheetName === INCOME_SHEET) writeSummaryBlock(sheet);
+
+  // כותרות עמודות
+  const headerRange = sheet.getRange(hRow, 1, 1, headers.length);
   headerRange.setValues([headers])
     .setFontWeight('bold')
     .setBackground(darkColor)
@@ -204,6 +219,7 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
     .setHorizontalAlignment('center');
 
   // נתונים
+  const dataRow = hRow + 1;
   if (entries.length > 0) {
     const rows = entries.map(e => [
       e.name    || '',
@@ -215,19 +231,19 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
       e.paidDate  ? new Date(e.paidDate)  : '',
       e.id      || '',
     ]);
-    sheet.getRange(2, 1, rows.length, 8).setValues(rows);
+    sheet.getRange(dataRow, 1, rows.length, 8).setValues(rows);
 
     // עיצוב שורות
     for (let i = 0; i < rows.length; i++) {
-      sheet.getRange(i + 2, 1, 1, 8).setBackground(i % 2 === 0 ? rowColor : WHITE);
+      sheet.getRange(dataRow + i, 1, 1, 8).setBackground(i % 2 === 0 ? rowColor : WHITE);
     }
 
     // פורמטים
     const n = entries.length;
-    sheet.getRange(2, 2, n, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(2, 3, n, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(2, 7, n, 1).setNumberFormat('dd/mm/yyyy');
-    sheet.getRange(2, 4, n, 1).setNumberFormat('₪#,##0');
+    sheet.getRange(dataRow, 2, n, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(dataRow, 3, n, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(dataRow, 7, n, 1).setNumberFormat('dd/mm/yyyy');
+    sheet.getRange(dataRow, 4, n, 1).setNumberFormat('₪#,##0');
   }
 
   // רוחב עמודות
@@ -240,12 +256,35 @@ function writeTab(entries, sheetName, darkColor, lightColor, rowColor) {
   sheet.setColumnWidth(7, 110); // ת.תשלום
   sheet.setColumnWidth(8, 1);   // ID — מוסתר (נדרש לסנכרון, אין למחוק/לערוך)
 
-  // הקפא שורת כותרת + פילטר
-  sheet.setFrozenRows(1);
+  // הקפא שורות כותרת (+ בלוק סיכום אם יש) + פילטר
+  sheet.setFrozenRows(hRow);
   try { const f = sheet.getFilter(); if (f) f.remove(); } catch(e) {}
   if (entries.length > 0) {
-    sheet.getRange(1, 1, entries.length + 1, 8).createFilter();
+    sheet.getRange(hRow, 1, entries.length + 1, 8).createFilter();
   }
+}
+
+// בלוק סיכום כספי בראש לשונית ההכנסות — סה"כ הכנסות/הוצאות שלא שולמו, מצב בנק, יתרה כוללת
+// (אותו חישוב כמו באפליקציה: סטטוס "שולם"/"שולם בביט"/"שולם בפייבוקס"/"שולם בהעברה" לא נכלל בסה"כ)
+function writeSummaryBlock(sheet) {
+  sheet.getRange('A1:B1').merge()
+    .setValue('💰 סיכום כספי')
+    .setFontWeight('bold').setFontSize(13)
+    .setBackground(SUMMARY_BG).setFontColor(WHITE)
+    .setHorizontalAlignment('center');
+
+  const rows = [
+    ['סה"כ הכנסות (שלא שולמו)', '=SUMIF(F8:F,"לא שולם",D8:D)+SUMIF(F8:F,"שולם חלקית",D8:D)'],
+    ['סה"כ הוצאות (שלא שולמו)', `=SUMIF('${EXPENSE_SHEET}'!F2:F,"לא שולם",'${EXPENSE_SHEET}'!D2:D)+SUMIF('${EXPENSE_SHEET}'!F2:F,"שולם חלקית",'${EXPENSE_SHEET}'!D2:D)`],
+    ['מצב בבנק', Number(PropertiesService.getScriptProperties().getProperty(BANK_PROP)) || 0],
+    ['יתרה כוללת', '=B4+B2-B3'],
+  ];
+  sheet.getRange(2, 1, rows.length, 2).setValues(rows);
+  sheet.getRange(2, 1, rows.length, 1).setFontWeight('bold');
+  sheet.getRange(2, 2, rows.length, 1).setNumberFormat('₪#,##0').setFontWeight('bold').setFontSize(13);
+  sheet.getRange(2, 1, rows.length, 2).setBackground('#f1f5f9');
+  sheet.getRange(5, 2).setFontColor(GREEN_DARK);
+  sheet.setColumnWidth(2, Math.max(sheet.getColumnWidth(2), 130));
 }
 
 // -------------------------------------------------------

@@ -616,12 +616,21 @@ function startEditBank() {
   inp.select();
 }
 function stopEditBank() {
-  localStorage.setItem('bankBalance', document.getElementById('bankBalance').value);
+  const val = document.getElementById('bankBalance').value;
+  localStorage.setItem('bankBalance', val);
   document.getElementById('bankBalance').style.display = 'none';
   document.getElementById('bankDisplay').style.display = 'block';
   updateSummary();
   localStorage.setItem('finance_savedAt', new Date().toISOString());
   scheduleGhSync();
+  pushBankToSheets(val);
+}
+async function pushBankToSheets(val) {
+  if (!SHEETS_SCRIPT_URL) return;
+  try {
+    const url = SHEETS_SCRIPT_URL + '?action=set_bank&key=' + encodeURIComponent(SECRET_KEY) + '&bank=' + encodeURIComponent(val || 0);
+    await fetch(url);
+  } catch {}
 }
 function loadBankBalance() {
   const saved = localStorage.getItem('bankBalance');
