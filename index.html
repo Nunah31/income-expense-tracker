@@ -969,19 +969,23 @@ async function mergeWithSheets() {
 
     const merged = [...entries];
     let added = 0, updated = 0;
+    const claimedIds = new Set(); // מונע שמספר שורות שונות בשיטס "ייבלעו" לתוך אותה רשומה באפליקציה
 
     for (const se of sheetsEntries) {
       if (!se.name) continue;
-      // התאמה לפי ID (אם קיים בשתי הרשומות) — אמין; אחרת לפי סוג+שם+ת.ביצוע (רשומות ישנות בלי ID)
+      // התאמה לפי ID (אם קיים בשתי הרשומות) — אמין; אחרת לפי סוג+שם+ת.ביצוע (רשומות ישנות בלי ID),
+      // ורק אם הרשומה הזו עדיין לא "נתפסה" ע"י שורה אחרת מהשיטס באותו מיזוג
       let matchIdx = se.id ? merged.findIndex(le => le.id === se.id) : -1;
       if (matchIdx < 0) {
         matchIdx = merged.findIndex(le =>
           le.type === se.type &&
           le.name.trim() === se.name.trim() &&
-          (le.execDate || '') === (se.execDate || '')
+          (le.execDate || '') === (se.execDate || '') &&
+          !claimedIds.has(le.id)
         );
       }
       if (matchIdx >= 0) {
+        claimedIds.add(merged[matchIdx].id);
         // קיים בשניהם — האפליקציה גוברת (מונע דריסת עדכונים טריים ע"י נתונים ישנים מהשיטס)
         // משלימים מהשיטס רק שדות שריקים באפליקציה
         const le = merged[matchIdx];
