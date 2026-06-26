@@ -1146,6 +1146,72 @@
       "status": "unpaid",
       "paidDate": "",
       "notes": "מופע 19/05/26"
+    },
+    {
+      "id": "show_34_0_1782457235620",
+      "type": "expense",
+      "name": "בוריס – הגברה",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע כפר יונה 25/06/26"
+    },
+    {
+      "id": "show_34_1_1782457235621",
+      "type": "expense",
+      "name": "דניאל טהאן",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע כפר יונה 25/06/26"
+    },
+    {
+      "id": "show_34_2_1782457235621",
+      "type": "expense",
+      "name": "עמית כהן",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע כפר יונה 25/06/26"
+    },
+    {
+      "id": "show_34_3_1782457235621",
+      "type": "expense",
+      "name": "ניב רז",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע כפר יונה 25/06/26"
+    },
+    {
+      "id": "show_34_4_1782457235621",
+      "type": "expense",
+      "name": "סקסופון - גיל סמואל",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע כפר יונה 25/06/26"
+    },
+    {
+      "id": "show_income_34_1782457235621",
+      "type": "income",
+      "name": "כפר יונה אודימיוזיק",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 25/06/26"
     }
   ],
   "bankBalance": "55014",
