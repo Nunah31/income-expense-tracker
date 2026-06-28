@@ -739,8 +739,52 @@
       "status": "unpaid",
       "paidDate": "",
       "notes": "מופע 25/06/26"
+    },
+    {
+      "id": "show_34_0_1782648273857",
+      "type": "expense",
+      "name": "בוריס – הגברה",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע כפר יונה 25/06/26"
+    },
+    {
+      "id": "show_34_1_1782648273857",
+      "type": "expense",
+      "name": "דניאל טהאן",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע כפר יונה 25/06/26"
+    },
+    {
+      "id": "show_34_2_1782648273857",
+      "type": "expense",
+      "name": "עמית כהן",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע כפר יונה 25/06/26"
+    },
+    {
+      "id": "show_income_34_1782648273857",
+      "type": "income",
+      "name": "כפר יונה אודימיוזיק",
+      "execDate": "2026-06-25",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 25/06/26"
     }
   ],
   "bankBalance": "55014",
-  "savedAt": "2026-06-28T11:57:08.390Z"
+  "savedAt": "2026-06-28T12:04:33.857Z"
 }
