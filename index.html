@@ -484,12 +484,11 @@ function getFilteredEntries() {
   return entries.filter(e => {
     if (currentTab !== 'all' && e.type !== currentTab) return false;
     if (search) {
+      const name = e.name ? String(e.name).toLowerCase() : '';
+      const notes = e.notes ? String(e.notes).toLowerCase() : '';
+      const execRaw = e.execDate ? String(e.execDate).toLowerCase() : '';
       const execFormatted = e.execDate ? formatDate(e.execDate).toLowerCase() : '';
-      const matches =
-        (e.name && e.name.toLowerCase().includes(search)) ||
-        (e.notes && e.notes.toLowerCase().includes(search)) ||
-        (e.execDate && e.execDate.toLowerCase().includes(search)) ||
-        execFormatted.includes(search);
+      const matches = name.includes(search) || notes.includes(search) || execRaw.includes(search) || execFormatted.includes(search);
       if (!matches) return false;
     }
     if (month && (!e.execDate || !e.execDate.startsWith(month))) return false;
