@@ -506,7 +506,10 @@ function updateFilterTotal(filtered) {
 
   if (!month && !search) { el.style.display = 'none'; return; }
 
-  const total = filtered.reduce((s, e) => s + effectiveAmount(e), 0);
+  // בחיפוש לפי שם — מציגים רק את מה שנשאר לשלם/לקבל (לא נכלל מה ששולם), כדי לדעת מה עוד פתוח
+  const total = search
+    ? filtered.reduce((s, e) => s + (isFullyPaid(e.status) ? 0 : (Number(e.amount) || 0)), 0)
+    : filtered.reduce((s, e) => s + effectiveAmount(e), 0);
   const count = filtered.length;
 
   let label = '';
@@ -515,7 +518,7 @@ function updateFilterTotal(filtered) {
     const mName = new Date(y, mo - 1).toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
     label = `סה"כ ביצוע ${mName}`;
   } else {
-    label = `סה"כ "${search}"`;
+    label = `נשאר לשלם "${search}"`;
   }
   if (search && month) label += ` + "${search}"`;
   label += ` (${count} רשומות)`;
