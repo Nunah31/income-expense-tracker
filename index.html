@@ -275,6 +275,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
   <div class="selection-bar" id="selectionBar">
     <span class="sel-count" id="selectionCount"></span>
     <span class="sel-sum" id="selectionSum"></span>
+    <button onclick="deleteSelected()" style="background:#dc2626; border-color:#dc2626;">מחק נבחרים 🗑️</button>
     <button onclick="clearSelection()">נקה בחירה ✕</button>
   </div>
 
@@ -529,6 +530,19 @@ function toggleSelect(id) {
 function clearSelection() {
   selectedIds.clear();
   renderList();
+}
+function deleteSelected() {
+  if (selectedIds.size === 0) return;
+  if (!confirm(`למחוק ${selectedIds.size} רשומות נבחרות?`)) return;
+  const idsToDelete = [...selectedIds];
+  entries = entries.filter(e => !selectedIds.has(e.id));
+  selectedIds.clear();
+  saveToStorage();
+  populateMonthFilter();
+  renderList();
+  updateSummary();
+  showStatus(`✅ נמחקו ${idsToDelete.length} רשומות`, 'success');
+  idsToDelete.forEach(id => deleteEntryFromSheets(id));
 }
 function updateSelectionBar() {
   const bar = document.getElementById('selectionBar');
