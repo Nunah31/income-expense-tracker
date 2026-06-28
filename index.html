@@ -259,7 +259,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     <select id="filterMonth" onchange="renderList()">
       <option value="">כל החודשים</option>
     </select>
-    <input type="text" id="filterSearch" placeholder="חיפוש לפי שם..." oninput="renderList()">
+    <input type="text" id="filterSearch" placeholder="חיפוש: שם / תאריך ביצוע / הערות..." oninput="renderList()">
     <select id="sortBy" onchange="renderList()">
       <option value="default">מיון: ברירת מחדל</option>
       <option value="name_asc">שם (א-ת)</option>
@@ -480,10 +480,18 @@ function populateMonthFilter() {
 
 function getFilteredEntries() {
   const month = document.getElementById('filterMonth').value;
-  const search = document.getElementById('filterSearch').value.toLowerCase();
+  const search = document.getElementById('filterSearch').value.toLowerCase().trim();
   return entries.filter(e => {
     if (currentTab !== 'all' && e.type !== currentTab) return false;
-    if (search && !e.name.toLowerCase().includes(search)) return false;
+    if (search) {
+      const execFormatted = e.execDate ? formatDate(e.execDate).toLowerCase() : '';
+      const matches =
+        (e.name && e.name.toLowerCase().includes(search)) ||
+        (e.notes && e.notes.toLowerCase().includes(search)) ||
+        (e.execDate && e.execDate.toLowerCase().includes(search)) ||
+        execFormatted.includes(search);
+      if (!matches) return false;
+    }
     if (month && (!e.execDate || !e.execDate.startsWith(month))) return false;
     return true;
   });
