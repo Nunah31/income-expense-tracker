@@ -790,8 +790,162 @@
       "status": "unpaid",
       "paidDate": "",
       "notes": "מופע 28/06/26"
+    },
+    {
+      "id": "show_23_0_1782976323681",
+      "type": "expense",
+      "name": "בוריס – הגברה",
+      "execDate": "2026-06-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע ישורון ראשון 30/06/26"
+    },
+    {
+      "id": "show_23_1_1782976323681",
+      "type": "expense",
+      "name": "עמית כהן",
+      "execDate": "2026-06-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע ישורון ראשון 30/06/26"
+    },
+    {
+      "id": "show_23_2_1782976323681",
+      "type": "expense",
+      "name": "דניאל טהאן",
+      "execDate": "2026-06-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע ישורון ראשון 30/06/26"
+    },
+    {
+      "id": "show_23_3_1782976323681",
+      "type": "expense",
+      "name": "ניב רז",
+      "execDate": "2026-06-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע ישורון ראשון 30/06/26"
+    },
+    {
+      "id": "show_23_4_1782976323681",
+      "type": "expense",
+      "name": "סקסופון - גיל סמואל",
+      "execDate": "2026-06-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע ישורון ראשון 30/06/26"
+    },
+    {
+      "id": "show_income_23_1782976323681",
+      "type": "income",
+      "name": "ישורון ראשון מנשה אמיר",
+      "execDate": "2026-06-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 30/06/26"
+    },
+    {
+      "id": "show_presenter_23_1782976323681",
+      "type": "expense",
+      "name": "מנשה אמיר",
+      "execDate": "2026-06-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע ישורון ראשון 30/06/26"
+    },
+    {
+      "id": "show_28_0_1782976323681",
+      "type": "expense",
+      "name": "סקסופון – עמירם גרנות צפון",
+      "execDate": "2026-06-29",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע בית ספר בגין - נהריה 29/06/26"
+    },
+    {
+      "id": "show_28_1_1782976323681",
+      "type": "expense",
+      "name": "עמית כהן",
+      "execDate": "2026-06-29",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע בית ספר בגין - נהריה 29/06/26"
+    },
+    {
+      "id": "show_28_2_1782976323681",
+      "type": "expense",
+      "name": "עומרי - גיטרה",
+      "execDate": "2026-06-29",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע בית ספר בגין - נהריה 29/06/26"
+    },
+    {
+      "id": "show_28_3_1782976323681",
+      "type": "expense",
+      "name": "בוריס – הגברה",
+      "execDate": "2026-06-29",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע בית ספר בגין - נהריה 29/06/26"
+    },
+    {
+      "id": "show_28_4_1782976323681",
+      "type": "expense",
+      "name": "קלידן ארנון שרון",
+      "execDate": "2026-06-29",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע בית ספר בגין - נהריה 29/06/26"
+    },
+    {
+      "id": "show_income_28_1782976323681",
+      "type": "income",
+      "name": "בית ספר בגין - נהריה מנשה אמיר",
+      "execDate": "2026-06-29",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 29/06/26"
+    },
+    {
+      "id": "show_presenter_28_1782976323681",
+      "type": "expense",
+      "name": "מנשה אמיר",
+      "execDate": "2026-06-29",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע בית ספר בגין - נהריה 29/06/26"
     }
   ],
   "bankBalance": "55514",
-  "savedAt": "2026-06-29T12:54:44.997Z"
+  "savedAt": "2026-07-02T07:12:03.681Z"
 }
