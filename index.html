@@ -56,14 +56,14 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .filter-bar select:focus, .filter-bar input:focus { outline: none; border-color: #16a34a; }
 
 /* ---- SELECTION BAR ---- */
-.selection-bar { display: none; background: #111827; color: white; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; position: sticky; bottom: 0; z-index: 100; }
+.selection-bar { display: none; background: #111827; color: white; border-radius: 12px; padding: 10px 14px; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%); width: calc(100% - 32px); max-width: 560px; z-index: 200; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
 .selection-bar.show { display: flex; }
 .selection-bar .sel-count { font-size: 14px; font-weight: 600; opacity: 0.85; }
 .selection-bar .sel-sum { font-size: 19px; font-weight: 700; }
 .selection-bar button { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.4); border-radius: 8px; padding: 6px 12px; font-family: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
 
 /* ---- ENTRIES LIST (טבלאי) ---- */
-.entries { display: flex; flex-direction: column; gap: 4px; background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; padding: 4px; }
+.entries { display: flex; flex-direction: column; gap: 4px; background: white; border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,0.07); overflow: hidden; padding: 4px; padding-bottom: 72px; }
 .entries-header { display: grid; grid-template-columns: 26px 1fr 78px 78px 92px; gap: 8px; padding: 8px 12px; font-size: 12px; font-weight: 700; color: #6b7280; background: white; border-radius: 12px 12px 0 0; box-shadow: 0 1px 4px rgba(0,0,0,0.07); margin-bottom: -1px; }
 .entries-header span:nth-child(3), .entries-header span:nth-child(4), .entries-header span:nth-child(5) { text-align: center; }
 .entry-row { border-radius: 10px; border-right: 4px solid transparent; cursor: pointer; transition: background 0.15s; padding: 8px 10px; }
@@ -609,8 +609,8 @@ function renderList() {
         <select class="qe-select" onchange="quickSave('${e.id}','status',this.value)">
           ${statusOptions(e.status)}
         </select>
-        <input type="date" lang="he" class="qe-date" value="${e.paidDate||''}" title="ת. ביצוע תשלום"
-          onchange="quickSave('${e.id}','paidDate',this.value)">
+        <input type="text" class="qe-date" value="${formatDate(e.paidDate)}" placeholder="dd/mm/yyyy" title="ת. ביצוע תשלום" maxlength="10"
+          onchange="quickSave('${e.id}','paidDate',parseDateIL(this.value))">
       </div>` : '';
 
     return `<div class="entry-row ${e.type} ${isFullyPaid(e.status)?'is-paid':''}" onclick="openModal('${e.id}')">
@@ -677,6 +677,15 @@ function formatDate(d) {
   if (!d) return '';
   const [y, m, day] = d.split('-');
   return `${day}/${m}/${y}`;
+}
+
+function parseDateIL(s) {
+  if (!s) return '';
+  const parts = s.split('/');
+  if (parts.length !== 3) return '';
+  const [day, m, y] = parts;
+  if (!day || !m || !y || y.length < 4) return '';
+  return `${y}-${m.padStart(2,'0')}-${day.padStart(2,'0')}`;
 }
 
 function formatAmount(a) {
