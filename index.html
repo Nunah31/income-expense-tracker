@@ -658,16 +658,22 @@ function statusOptions(current) {
 
 function next15AfterDate(dateStr) {
   const d = dateStr ? new Date(dateStr) : new Date();
-  return new Date(d.getFullYear(), d.getMonth() + 1, 15).toISOString().split('T')[0];
+  const r = new Date(d.getFullYear(), d.getMonth() + 1, 15);
+  return `${r.getFullYear()}-${String(r.getMonth()+1).padStart(2,'0')}-15`;
 }
 
 function quickSave(id, field, value) {
   const idx = entries.findIndex(e => e.id === id);
   if (idx === -1) return;
   entries[idx][field] = value;
-  if (field === 'status' && isFullyPaid(value)) {
-    if (!entries[idx].paidDate) entries[idx].paidDate = todayStr();
-    entries[idx].payDate = next15AfterDate(entries[idx].paidDate);
+  if (field === 'status') {
+    if (isFullyPaid(value)) {
+      if (!entries[idx].paidDate) entries[idx].paidDate = todayStr();
+      entries[idx].payDate = next15AfterDate(entries[idx].paidDate);
+    } else {
+      entries[idx].paidDate = '';
+      entries[idx].payDate = '';
+    }
   }
   if (field === 'paidDate' && isFullyPaid(entries[idx].status)) {
     entries[idx].payDate = next15AfterDate(value);
