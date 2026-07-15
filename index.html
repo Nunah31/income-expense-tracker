@@ -334,7 +334,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">סטטוס</label>
-        <select class="form-select" id="fieldStatus">
+        <select class="form-select" id="fieldStatus" onchange="onModalStatusChange(this.value)">
           <option value="unpaid">לא שולם ❌</option>
           <option value="paid">שולם ✅</option>
           <option value="paid_bit">שולם בביט 📱</option>
@@ -862,6 +862,17 @@ function todayStr() {
   return new Date().toISOString().split('T')[0];
 }
 
+function onModalStatusChange(status) {
+  if (isFullyPaid(status)) {
+    const paidEl = document.getElementById('fieldPaidDate');
+    if (!paidEl.value) paidEl.value = todayStr();
+    document.getElementById('fieldPayDate').value = next15AfterDate(paidEl.value);
+  } else {
+    document.getElementById('fieldPaidDate').value = '';
+    document.getElementById('fieldPayDate').value = '';
+  }
+}
+
 // ---- SAVE / DELETE ----
 function saveEntry() {
   const name = document.getElementById('fieldName').value.trim();
@@ -882,6 +893,9 @@ function saveEntry() {
   if (isFullyPaid(status)) {
     if (!paidDate) paidDate = todayStr();
     payDate = next15AfterDate(paidDate);
+  } else {
+    paidDate = '';
+    payDate = '';
   }
   const entry = {
     id: editingId || Date.now().toString(),
