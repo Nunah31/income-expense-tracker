@@ -56,7 +56,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 .filter-bar select:focus, .filter-bar input:focus { outline: none; border-color: #16a34a; }
 
 /* ---- SELECTION BAR ---- */
-.selection-bar { display: none; background: #111827; color: white; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.selection-bar { display: none; background: #111827; color: white; border-radius: 12px; padding: 10px 14px; margin-bottom: 12px; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; position: sticky; bottom: 0; z-index: 100; }
 .selection-bar.show { display: flex; }
 .selection-bar .sel-count { font-size: 14px; font-weight: 600; opacity: 0.85; }
 .selection-bar .sel-sum { font-size: 19px; font-weight: 700; }
@@ -261,11 +261,10 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     </select>
     <input type="text" id="filterSearch" placeholder="חיפוש: שם / תאריך ביצוע / הערות..." oninput="renderList()">
     <select id="sortBy" onchange="renderList()">
-      <option value="default">מיון: ברירת מחדל</option>
+      <option value="exec_asc" selected>תאריך ביצוע (ישן-חדש)</option>
+      <option value="exec_desc">תאריך ביצוע (חדש-ישן)</option>
       <option value="name_asc">שם (א-ת)</option>
       <option value="name_desc">שם (ת-א)</option>
-      <option value="exec_asc">תאריך ביצוע (ישן-חדש)</option>
-      <option value="exec_desc">תאריך ביצוע (חדש-ישן)</option>
     </select>
   </div>
   <div id="filterTotal" style="display:none; background:white; border-radius:12px; padding:10px 16px; margin-bottom:12px; box-shadow:0 1px 4px rgba(0,0,0,0.07); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
@@ -308,11 +307,11 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">ת. ביצוע</label>
-        <input type="date" class="form-input" id="fieldExecDate">
+        <input type="date" lang="he" class="form-input" id="fieldExecDate">
       </div>
       <div class="form-group">
         <label class="form-label">ת. פרעון (תשלום)</label>
-        <input type="date" class="form-input" id="fieldPayDate">
+        <input type="date" lang="he" class="form-input" id="fieldPayDate">
       </div>
     </div>
 
@@ -346,7 +345,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       </div>
       <div class="form-group">
         <label class="form-label">ת. ביצוע תשלום</label>
-        <input type="date" class="form-input" id="fieldPaidDate">
+        <input type="date" lang="he" class="form-input" id="fieldPaidDate">
       </div>
     </div>
 
@@ -610,7 +609,7 @@ function renderList() {
         <select class="qe-select" onchange="quickSave('${e.id}','status',this.value)">
           ${statusOptions(e.status)}
         </select>
-        <input type="date" class="qe-date" value="${e.paidDate||''}" title="ת. ביצוע תשלום"
+        <input type="date" lang="he" class="qe-date" value="${e.paidDate||''}" title="ת. ביצוע תשלום"
           onchange="quickSave('${e.id}','paidDate',this.value)">
       </div>` : '';
 
@@ -661,6 +660,13 @@ function quickSave(id, field, value) {
   const idx = entries.findIndex(e => e.id === id);
   if (idx === -1) return;
   entries[idx][field] = value;
+  if (field === 'status' && isFullyPaid(value)) {
+    const today = todayStr();
+    entries[idx].paidDate = today;
+    const now = new Date();
+    const next15 = new Date(now.getFullYear(), now.getMonth() + 1, 15);
+    entries[idx].payDate = next15.toISOString().split('T')[0];
+  }
   saveToStorage();
   renderList();
   updateSummary();
