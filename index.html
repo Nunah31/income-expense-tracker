@@ -865,16 +865,27 @@ function saveEntry() {
     subAmounts = [];
   }
 
+  const status = document.getElementById('fieldStatus').value;
+  let paidDate = document.getElementById('fieldPaidDate').value;
+  let payDate = document.getElementById('fieldPayDate').value;
+  if (isFullyPaid(status)) {
+    if (!paidDate) paidDate = todayStr();
+    if (!payDate) {
+      const now = new Date();
+      const next15 = new Date(now.getFullYear(), now.getMonth() + 1, 15);
+      payDate = next15.toISOString().split('T')[0];
+    }
+  }
   const entry = {
     id: editingId || Date.now().toString(),
     type: editingType,
     name,
     execDate: document.getElementById('fieldExecDate').value,
-    payDate: document.getElementById('fieldPayDate').value,
+    payDate,
     amount,
     subAmounts,
-    status: document.getElementById('fieldStatus').value,
-    paidDate: document.getElementById('fieldPaidDate').value,
+    status,
+    paidDate,
     notes: document.getElementById('fieldNotes').value.trim(),
   };
 
