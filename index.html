@@ -656,16 +656,21 @@ function statusOptions(current) {
   return opts.map(([v,l]) => `<option value="${v}"${v===current?' selected':''}>${l}</option>`).join('');
 }
 
+function next15AfterDate(dateStr) {
+  const d = dateStr ? new Date(dateStr) : new Date();
+  return new Date(d.getFullYear(), d.getMonth() + 1, 15).toISOString().split('T')[0];
+}
+
 function quickSave(id, field, value) {
   const idx = entries.findIndex(e => e.id === id);
   if (idx === -1) return;
   entries[idx][field] = value;
   if (field === 'status' && isFullyPaid(value)) {
-    const today = todayStr();
-    entries[idx].paidDate = today;
-    const now = new Date();
-    const next15 = new Date(now.getFullYear(), now.getMonth() + 1, 15);
-    entries[idx].payDate = next15.toISOString().split('T')[0];
+    if (!entries[idx].paidDate) entries[idx].paidDate = todayStr();
+    entries[idx].payDate = next15AfterDate(entries[idx].paidDate);
+  }
+  if (field === 'paidDate' && isFullyPaid(entries[idx].status)) {
+    entries[idx].payDate = next15AfterDate(value);
   }
   saveToStorage();
   renderList();
@@ -870,11 +875,7 @@ function saveEntry() {
   let payDate = document.getElementById('fieldPayDate').value;
   if (isFullyPaid(status)) {
     if (!paidDate) paidDate = todayStr();
-    if (!payDate) {
-      const now = new Date();
-      const next15 = new Date(now.getFullYear(), now.getMonth() + 1, 15);
-      payDate = next15.toISOString().split('T')[0];
-    }
+    payDate = next15AfterDate(paidDate);
   }
   const entry = {
     id: editingId || Date.now().toString(),
