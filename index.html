@@ -270,6 +270,11 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <option value="">כל החודשים</option>
     </select>
     <input type="text" id="filterSearch" placeholder="חיפוש: שם / תאריך ביצוע / הערות..." oninput="renderList()">
+    <select id="filterStatus" onchange="renderList()">
+      <option value="">כל הסטטוסים</option>
+      <option value="unpaid">לא שולם</option>
+      <option value="paid">שולם</option>
+    </select>
     <select id="sortBy" onchange="renderList()">
       <option value="exec_asc" selected>תאריך ביצוע (ישן-חדש)</option>
       <option value="exec_desc">תאריך ביצוע (חדש-ישן)</option>
@@ -490,8 +495,11 @@ function populateMonthFilter() {
 function getFilteredEntries() {
   const month = document.getElementById('filterMonth').value;
   const search = document.getElementById('filterSearch').value.toLowerCase().trim();
+  const statusFilter = document.getElementById('filterStatus').value;
   return entries.filter(e => {
     if (currentTab !== 'all' && e.type !== currentTab) return false;
+    if (statusFilter === 'paid' && !isFullyPaid(e.status)) return false;
+    if (statusFilter === 'unpaid' && isFullyPaid(e.status)) return false;
     if (search) {
       const name = e.name ? String(e.name).toLowerCase() : '';
       const notes = e.notes ? String(e.notes).toLowerCase() : '';
