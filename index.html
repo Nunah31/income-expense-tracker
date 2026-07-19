@@ -229,7 +229,6 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <div class="header-sub" id="headerSub">טוען...</div>
     </div>
     <div class="header-actions">
-      <button class="btn-sync" onclick="mergeWithSheets()">🔀 מיזוג שיטס</button>
       <button class="btn-sync" id="btnSync" onclick="manualSync()">☁️ סנכרון</button>
       <button class="btn-sync" onclick="showGhSetup()" title="הגדרת טוקן" style="padding:9px 10px;">⚙️</button>
       <button class="btn-add-main" onclick="openModal()">+ הוספה</button>
@@ -1100,91 +1099,6 @@ async function pushToSheets() {
     : '⚠️ נשמרו ' + ok + ' מתוך ' + entries.length, ok === entries.length ? 'success' : 'error');
 }
 
-// ---- MERGE WITH SHEETS ----
-async function mergeWithSheets() {
-  if (!SHEETS_SCRIPT_URL) return;
-  showStatus('🔀 קורא מהשיטס...', '');
-  try {
-    const url = SHEETS_SCRIPT_URL + '?action=read_sheet&key=' + encodeURIComponent(SECRET_KEY);
-    const res = await fetch(url);
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const json = await res.json();
-    if (!json.success) throw new Error(json.error || 'שגיאה');
-
-    const sheetsEntries = json.data || [];
-    if (sheetsEntries.length === 0) {
-      showStatus('השיטס ריק — אין מה למזג', '');
-      return;
-    }
-
-    const merged = [...entries];
-    let added = 0, updated = 0;
-    const claimedIds = new Set(); // מונע שמספר שורות שונות בשיטס "ייבלעו" לתוך אותה רשומה באפליקציה
-
-    for (const se of sheetsEntries) {
-      if (!se.name) continue;
-      // התאמה לפי ID (אם קיים בשתי הרשומות) — אמין; אחרת לפי סוג+שם+ת.ביצוע (רשומות ישנות בלי ID),
-      // ורק אם הרשומה הזו עדיין לא "נתפסה" ע"י שורה אחרת מהשיטס באותו מיזוג
-      const matchedById = !!se.id && merged.findIndex(le => le.id === se.id) >= 0;
-      let matchIdx = se.id ? merged.findIndex(le => le.id === se.id) : -1;
-      if (matchIdx < 0) {
-        matchIdx = merged.findIndex(le =>
-          le.type === se.type &&
-          le.name.trim() === se.name.trim() &&
-          (le.execDate || '') === (se.execDate || '') &&
-          !claimedIds.has(le.id)
-        );
-      }
-      if (matchIdx >= 0) {
-        claimedIds.add(merged[matchIdx].id);
-        // קיים בשניהם — האפליקציה גוברת (מונע דריסת עדכונים טריים ע"י נתונים ישנים מהשיטס)
-        // משלימים מהשיטס רק שדות שריקים באפליקציה
-        // את השם מעדכנים מהשיטס כשההתאמה היא לפי ID (אמינה) — כך שינוי שם שאודי עשה בשיטס ישתקף
-        const le = merged[matchIdx];
-        merged[matchIdx] = {
-          ...le,
-          name:     matchedById ? (se.name || le.name) : le.name,
-          payDate:  le.payDate  || se.payDate,
-          amount:   le.amount   || se.amount,
-          notes:    le.notes    || se.notes,
-          paidDate: le.paidDate || se.paidDate,
-        };
-        updated++;
-      } else {
-        // חדש — אודי הוסיף בשיטס; שומרים את ה-ID שהשיטס נתן לו כדי שמיזוגים עתידיים יתאימו נכון
-        merged.push({ ...se, id: se.id || (Date.now().toString() + Math.random().toString(36).slice(2)) });
-        added++;
-      }
-    }
-
-    // מחיקות — שורות שאודי מחק בשיטס נמחקות גם באפליקציה
-    // (בטוח לעשות זאת כי כל שינוי באפליקציה נשלח אוטומטית לשיטס, אז מזהה שלא מופיע בשיטס = נמחק שם)
-    let deleted = 0;
-    ['income', 'expense'].forEach(type => {
-      const sheetIdsForType = new Set(sheetsEntries.filter(se => se.type === type && se.id).map(se => se.id));
-      if (sheetIdsForType.size === 0) return; // הגנה — לא למחוק אם לא התקבלו נתונים לסוג הזה
-      for (let i = merged.length - 1; i >= 0; i--) {
-        if (merged[i].type === type && merged[i].id && !sheetIdsForType.has(merged[i].id)) {
-          merged.splice(i, 1);
-          deleted++;
-        }
-      }
-    });
-
-    entries = merged;
-    saveToStorage();
-    populateMonthFilter();
-    renderList();
-    updateSummary();
-
-    // שמור את המיזוג חזרה לשיטס ול-GitHub
-    scheduleGhSync();
-
-    showStatus(`✅ מוזג: ${added} חדשות, ${updated} עודכנו, ${deleted} נמחקו`, 'success');
-  } catch(err) {
-    showStatus('❌ מיזוג: ' + err.message, 'error');
-  }
-}
 
 // ---- GITHUB SYNC ----
 const GH_REPO = 'Nunah31/income-expense-tracker-data';
