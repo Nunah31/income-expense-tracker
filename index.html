@@ -472,6 +472,7 @@ function setTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   const tabs = { income: 0, expense: 1, all: 2 };
   document.querySelectorAll('.tab')[tabs[tab]].classList.add('active');
+  document.getElementById('filterSearch').value = '';
   renderList();
 }
 
