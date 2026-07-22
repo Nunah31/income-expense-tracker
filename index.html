@@ -321,11 +321,11 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">ת. ביצוע</label>
-        <input type="text" class="form-input" id="fieldExecDate" placeholder="dd/mm/yyyy" maxlength="10">
+        <input type="date" class="form-input" id="fieldExecDate">
       </div>
       <div class="form-group">
         <label class="form-label">ת. פרעון (תשלום)</label>
-        <input type="text" class="form-input" id="fieldPayDate" placeholder="dd/mm/yyyy" maxlength="10">
+        <input type="date" class="form-input" id="fieldPayDate">
       </div>
     </div>
 
@@ -359,7 +359,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       </div>
       <div class="form-group">
         <label class="form-label">ת. ביצוע תשלום</label>
-        <input type="text" class="form-input" id="fieldPaidDate" placeholder="dd/mm/yyyy" maxlength="10">
+        <input type="date" class="form-input" id="fieldPaidDate">
       </div>
     </div>
 
@@ -796,11 +796,11 @@ function openModal(id) {
     document.getElementById('modalTitle').textContent = 'עריכת רשומה';
     document.getElementById('btnDelete').style.display = 'block';
     document.getElementById('fieldName').value = e.name || '';
-    document.getElementById('fieldExecDate').value = formatDate(e.execDate);
-    document.getElementById('fieldPayDate').value = formatDate(e.payDate);
+    document.getElementById('fieldExecDate').value = e.execDate || '';
+    document.getElementById('fieldPayDate').value = e.payDate || '';
     document.getElementById('fieldAmount').value = e.amount || '';
     document.getElementById('fieldStatus').value = e.status || 'unpaid';
-    document.getElementById('fieldPaidDate').value = formatDate(e.paidDate);
+    document.getElementById('fieldPaidDate').value = e.paidDate || '';
     document.getElementById('fieldNotes').value = e.notes || '';
     setType(e.type);
     if (e.type === 'expense') {
@@ -813,7 +813,7 @@ function openModal(id) {
     document.getElementById('modalTitle').textContent = 'הוספת רשומה';
     document.getElementById('btnDelete').style.display = 'none';
     document.getElementById('fieldName').value = '';
-    document.getElementById('fieldExecDate').value = formatDate(todayStr());
+    document.getElementById('fieldExecDate').value = todayStr();
     document.getElementById('fieldPayDate').value = '';
     document.getElementById('fieldAmount').value = '';
     document.getElementById('fieldStatus').value = 'unpaid';
@@ -885,9 +885,8 @@ function todayStr() {
 function onModalStatusChange(status) {
   if (isFullyPaid(status)) {
     const paidEl = document.getElementById('fieldPaidDate');
-    if (!paidEl.value) paidEl.value = formatDate(todayStr());
-    const paidIso = parseDateIL(paidEl.value) || todayStr();
-    document.getElementById('fieldPayDate').value = formatDate(next15AfterDate(paidIso));
+    if (!paidEl.value) paidEl.value = todayStr();
+    document.getElementById('fieldPayDate').value = next15AfterDate(paidEl.value);
   } else {
     document.getElementById('fieldPaidDate').value = '';
     document.getElementById('fieldPayDate').value = '';
@@ -909,8 +908,8 @@ function saveEntry() {
   }
 
   const status = document.getElementById('fieldStatus').value;
-  let paidDate = parseDateIL(document.getElementById('fieldPaidDate').value);
-  let payDate = parseDateIL(document.getElementById('fieldPayDate').value);
+  let paidDate = document.getElementById('fieldPaidDate').value;
+  let payDate = document.getElementById('fieldPayDate').value;
   if (isFullyPaid(status)) {
     if (!paidDate) paidDate = todayStr();
     payDate = next15AfterDate(paidDate);
@@ -922,7 +921,7 @@ function saveEntry() {
     id: editingId || Date.now().toString(),
     type: editingType,
     name,
-    execDate: parseDateIL(document.getElementById('fieldExecDate').value),
+    execDate: document.getElementById('fieldExecDate').value,
     payDate,
     amount,
     subAmounts,
