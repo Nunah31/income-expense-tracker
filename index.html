@@ -764,6 +764,7 @@ function isFullyPaid(status) {
 }
 function effectiveAmount(e) {
   if (e.type === 'expense') {
+    if (e.status === 'paid_transfer') return 0;
     if (isFullyPaid(e.status) && e.payDate && e.payDate <= todayStr()) return 0;
     return Number(e.amount) || 0;
   }
