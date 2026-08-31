@@ -1241,6 +1241,16 @@ if ('serviceWorker' in navigator) {
   }).catch(() => {});
 }
 
+// ---- AUTO-SAVE ON EXIT ----
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'hidden' && ghToken()) {
+    githubSave();
+  }
+});
+window.addEventListener('pagehide', () => {
+  if (ghToken()) githubSave();
+});
+
 // ---- START ----
 init();
 </script>
