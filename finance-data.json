@@ -472,7 +472,73 @@
       "notes": "",
       "status": "paid_paybox",
       "paidDate": "2026-08-16"
+    },
+    {
+      "id": "show_29_0_1788185137227",
+      "type": "expense",
+      "name": "דניאל טהאן",
+      "execDate": "2026-08-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע הרצליה 30/08/26"
+    },
+    {
+      "id": "show_29_1_1788185137227",
+      "type": "expense",
+      "name": "ניב רז",
+      "execDate": "2026-08-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע הרצליה 30/08/26"
+    },
+    {
+      "id": "show_29_2_1788185137227",
+      "type": "expense",
+      "name": "עמית כהן",
+      "execDate": "2026-08-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע הרצליה 30/08/26"
+    },
+    {
+      "id": "show_29_3_1788185137227",
+      "type": "expense",
+      "name": "בוריס – הגברה",
+      "execDate": "2026-08-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע הרצליה 30/08/26"
+    },
+    {
+      "id": "show_income_29_1788185137227",
+      "type": "income",
+      "name": "הרצליה מנשה אמיר",
+      "execDate": "2026-08-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 30/08/26"
+    },
+    {
+      "id": "show_presenter_29_1788185137227",
+      "type": "expense",
+      "name": "מנשה אמיר",
+      "execDate": "2026-08-30",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע הרצליה 30/08/26"
     }
   ],
-  "savedAt": "2026-08-31T13:40:53.791Z"
+  "savedAt": "2026-08-31T14:05:37.227Z"
 }
