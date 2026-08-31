@@ -587,7 +587,7 @@ function updateSelectionBar() {
   const bar = document.getElementById('selectionBar');
   if (selectedIds.size === 0) { bar.classList.remove('show'); return; }
   const selected = entries.filter(e => selectedIds.has(e.id));
-  const sum = selected.reduce((s, e) => s + effectiveAmount(e), 0);
+  const sum = selected.reduce((s, e) => s + (Number(e.amount) || 0), 0);
   document.getElementById('selectionCount').textContent = `נבחרו ${selectedIds.size} שורות`;
   document.getElementById('selectionSum').textContent = formatAmount(sum);
   bar.classList.add('show');
