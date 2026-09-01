@@ -670,7 +670,73 @@
       "status": "unpaid",
       "paidDate": "",
       "notes": "מופע 01/09/26"
+    },
+    {
+      "id": "show_38_0_1788276576501",
+      "type": "expense",
+      "name": "בוריס – הגברה",
+      "execDate": "2026-09-01",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע עכו העלייה השנייה 01/09/26"
+    },
+    {
+      "id": "show_38_1_1788276576501",
+      "type": "expense",
+      "name": "דניאל טהאן",
+      "execDate": "2026-09-01",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע עכו העלייה השנייה 01/09/26"
+    },
+    {
+      "id": "show_38_2_1788276576501",
+      "type": "expense",
+      "name": "עמית כהן",
+      "execDate": "2026-09-01",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע עכו העלייה השנייה 01/09/26"
+    },
+    {
+      "id": "show_38_3_1788276576501",
+      "type": "expense",
+      "name": "עומרי - גיטרה",
+      "execDate": "2026-09-01",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע עכו העלייה השנייה 01/09/26"
+    },
+    {
+      "id": "show_38_4_1788276576501",
+      "type": "expense",
+      "name": "סקסופון – עמירם גרנות צפון",
+      "execDate": "2026-09-01",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע עכו העלייה השנייה 01/09/26"
+    },
+    {
+      "id": "show_income_38_1788276576501",
+      "type": "income",
+      "name": "עכו העלייה השנייה אודימיוזיק",
+      "execDate": "2026-09-01",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 01/09/26"
     }
   ],
-  "savedAt": "2026-09-01T15:29:24.622Z"
+  "savedAt": "2026-09-01T15:29:36.501Z"
 }
