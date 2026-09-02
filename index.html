@@ -920,11 +920,14 @@ function todayStr() {
 }
 
 function syncDateDisplay(nativeId, displayId) {
-  document.getElementById(displayId).value = formatDate(document.getElementById(nativeId).value);
+  const d = document.getElementById(displayId);
+  if (d) d.value = formatDate(document.getElementById(nativeId).value);
 }
 function setModalDate(nativeId, displayId, isoVal) {
-  document.getElementById(nativeId).value = isoVal || '';
-  document.getElementById(displayId).value = formatDate(isoVal);
+  const native = document.getElementById(nativeId);
+  if (native) native.value = isoVal || '';
+  const display = document.getElementById(displayId);
+  if (display) display.value = formatDate(isoVal);
 }
 
 function onModalStatusChange(status) {
