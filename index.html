@@ -336,8 +336,8 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
     </div>
 
     <div class="type-toggle">
-      <button class="type-btn active-income" id="typeIncome" onclick="setType('income')">📥 הכנסה</button>
-      <button class="type-btn" id="typeExpense" onclick="setType('expense')">📤 הוצאה</button>
+      <button class="type-btn active-income" id="typeIncome" onclick="if(!editingId)setType('income')">📥 הכנסה</button>
+      <button class="type-btn" id="typeExpense" onclick="if(!editingId)setType('expense')">📤 הוצאה</button>
     </div>
 
     <div class="form-group">
@@ -838,7 +838,7 @@ function openModal(id) {
     document.getElementById('fieldStatus').value = e.status || 'unpaid';
     setModalDate('fieldPaidDate','fieldPaidDateDisplay', e.paidDate);
     document.getElementById('fieldNotes').value = e.notes || '';
-    setType(e.type);
+    setType(e.type || currentTab || 'income');
     if (e.type === 'expense') {
       document.getElementById('amountsList').innerHTML = '';
       const subs = e.subAmounts && e.subAmounts.length ? e.subAmounts : (e.amount ? [{value: e.amount, note: ''}] : []);
