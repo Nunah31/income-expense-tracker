@@ -1253,6 +1253,26 @@ window.addEventListener('pagehide', () => {
 
 // ---- START ----
 init();
+
+async function forceLoadFromGithub() {
+  const token = localStorage.getItem('gh_token');
+  if (!token) { alert('אין Token מוגדר'); return; }
+  try {
+    const r = await fetch('https://api.github.com/repos/Nunah31/income-expense-tracker/contents/finance-data.json',
+      { headers: { Authorization: 'token ' + token, Accept: 'application/vnd.github.v3+json' }, cache: 'no-store' });
+    if (!r.ok) { alert('שגיאה: ' + r.status); return; }
+    const d = await r.json();
+    const bin = atob(d.content.replace(/\n/g,''));
+    const bytes = new Uint8Array(bin.length);
+    for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+    const data = JSON.parse(new TextDecoder('utf-8').decode(bytes));
+    localStorage.setItem('finance_entries', JSON.stringify(data.entries));
+    localStorage.setItem('finance_savedAt', data.savedAt);
+    alert('נטענו ' + data.entries.length + ' רשומות ✅\nרעני את הדף לצפייה');
+    location.reload();
+  } catch(e) { alert('שגיאה: ' + e.message); }
+}
 </script>
+<div style="padding:0 0 16px"><button onclick="forceLoadFromGithub()" style="width:100%;padding:12px;background:#1E3A5F;color:white;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">🔄 טען עדכון מ-GitHub</button><p style="font-size:12px;color:#64748B;text-align:center;margin-top:6px">לחצי כשאפליקציית המופעים שלחה נתונים חדשים</p></div>
 </body>
 </html>
