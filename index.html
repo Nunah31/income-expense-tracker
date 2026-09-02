@@ -838,8 +838,9 @@ function openModal(id) {
     document.getElementById('fieldStatus').value = e.status || 'unpaid';
     setModalDate('fieldPaidDate','fieldPaidDateDisplay', e.paidDate);
     document.getElementById('fieldNotes').value = e.notes || '';
-    setType(e.type || currentTab || 'income');
-    if (e.type === 'expense') {
+    const resolvedType = currentTab !== 'all' ? currentTab : (e.type || 'income');
+    setType(resolvedType);
+    if (resolvedType === 'expense') {
       document.getElementById('amountsList').innerHTML = '';
       const subs = e.subAmounts && e.subAmounts.length ? e.subAmounts : (e.amount ? [{value: e.amount, note: ''}] : []);
       subs.forEach(s => addAmountRow(s.value || '', s.note || ''));
