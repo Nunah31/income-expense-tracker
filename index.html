@@ -184,7 +184,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
 </head>
 <body>
 
-<!-- GITHUB SETUP SCREEN -->
+<!-- GITHUB SETUP SCREEN (first time only) -->
 <div id="ghSetup" style="display:none; position:fixed; inset:0; background:linear-gradient(135deg,#1e3a5f,#1d4ed8); z-index:998; align-items:center; justify-content:center; flex-direction:column; gap:16px;">
   <div style="font-size:40px;">☁️</div>
   <div style="color:white; font-size:20px; font-weight:700;">הגדרת סנכרון</div>
@@ -203,6 +203,29 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       style="width:100%; background:transparent; color:#6b7280; border:none; padding:10px; font-size:13px; cursor:pointer; font-family:inherit; margin-top:4px;">
       דלג (עבודה מקומית בלבד)
     </button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div id="settingsModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.45); z-index:999; align-items:center; justify-content:center;" onclick="if(event.target===this)closeSettings()">
+  <div style="background:white; border-radius:20px; padding:28px 28px 24px; width:320px; box-shadow:0 8px 32px rgba(0,0,0,0.2); direction:rtl;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+      <div style="font-size:18px; font-weight:700; color:#111827;">⚙️ הגדרות</div>
+      <button onclick="closeSettings()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#6b7280;">✕</button>
+    </div>
+    <div style="background:#f3f4f6; border-radius:12px; padding:14px 16px; margin-bottom:20px;">
+      <div style="font-size:13px; font-weight:600; color:#374151; margin-bottom:6px;">מצב סנכרון</div>
+      <div id="settingsSyncStatus" style="font-size:14px;"></div>
+    </div>
+    <div style="font-size:13px; font-weight:600; color:#374151; margin-bottom:8px;">החלפת טוקן</div>
+    <input id="settingsTokenInput" type="password" autocomplete="off" placeholder="ghp_..."
+      style="width:100%; border:1.5px solid #d1d5db; border-radius:10px; padding:11px 14px; font-size:14px; font-family:monospace; outline:none; margin-bottom:8px; box-sizing:border-box;"
+      onfocus="this.style.borderColor='#1d4ed8'" onblur="this.style.borderColor='#d1d5db'">
+    <div id="settingsTokenError" style="color:#dc2626; font-size:12px; margin-bottom:10px; display:none;"></div>
+    <div style="display:flex; gap:8px;">
+      <button onclick="saveSettingsToken()" style="flex:1; background:#1d4ed8; color:white; border:none; border-radius:10px; padding:11px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">שמור טוקן</button>
+      <button onclick="clearSettingsToken()" style="flex:1; background:#fee2e2; color:#dc2626; border:none; border-radius:10px; padding:11px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit;">נקה טוקן</button>
+    </div>
   </div>
 </div>
 
@@ -234,7 +257,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <div class="header-sub" id="headerSub">טוען...</div>
     </div>
     <div class="header-actions">
-      <button class="btn-sync" onclick="showGhSetup()" title="הגדרת טוקן" style="padding:9px 10px;">⚙️</button>
+      <button class="btn-sync" onclick="openSettings()" title="הגדרות" style="padding:9px 10px;">⚙️</button>
       <button class="btn-add-main" onclick="openModal()">+ הוספה</button>
     </div>
   </div>
@@ -1230,8 +1253,45 @@ async function manualSync() {
 }
 
 function showGhSetup() {
-  const s = document.getElementById('ghSetup');
-  s.style.display = 'flex';
+  document.getElementById('ghSetup').style.display = 'flex';
+}
+
+function openSettings() {
+  const token = ghToken();
+  const el = document.getElementById('settingsSyncStatus');
+  if (token) {
+    const savedAt = localStorage.getItem('finance_savedAt') || '';
+    const timeStr = savedAt ? new Date(savedAt).toLocaleString('he-IL') : 'לא ידוע';
+    el.innerHTML = `<span style="color:#16a34a; font-weight:600;">✅ מחובר לענן</span><br><span style="font-size:12px; color:#6b7280;">גיבוי אחרון: ${timeStr}</span>`;
+  } else {
+    el.innerHTML = `<span style="color:#dc2626; font-weight:600;">❌ לא מחובר</span><br><span style="font-size:12px; color:#6b7280;">טוקן לא הוגדר</span>`;
+  }
+  document.getElementById('settingsTokenInput').value = '';
+  document.getElementById('settingsTokenError').style.display = 'none';
+  document.getElementById('settingsModal').style.display = 'flex';
+}
+
+function closeSettings() {
+  document.getElementById('settingsModal').style.display = 'none';
+}
+
+function saveSettingsToken() {
+  const val = document.getElementById('settingsTokenInput').value.trim();
+  const err = document.getElementById('settingsTokenError');
+  if (!val) { err.textContent = 'יש להזין טוקן'; err.style.display = 'block'; return; }
+  if (!val.startsWith('ghp_') && !val.startsWith('github_pat_')) {
+    err.textContent = 'טוקן לא תקין — חייב להתחיל ב-ghp_'; err.style.display = 'block'; return;
+  }
+  localStorage.setItem('gh_token', val);
+  closeSettings();
+  showStatus('✅ טוקן נשמר', 'success');
+}
+
+function clearSettingsToken() {
+  if (!confirm('למחוק את הטוקן? הסנכרון לא יעבוד עד שתגדירי טוקן חדש.')) return;
+  localStorage.removeItem('gh_token');
+  closeSettings();
+  showStatus('🔓 טוקן נמחק', '');
 }
 
 // ---- SERVICE WORKER ----
