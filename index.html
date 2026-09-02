@@ -1288,7 +1288,8 @@ function saveSettingsToken() {
   }
   localStorage.setItem('gh_token', val);
   closeSettings();
-  showStatus('✅ טוקן נשמר', 'success');
+  showStatus('☁️ טוקן נשמר, טוען נתונים...', '');
+  startApp();
 }
 
 function clearSettingsToken() {
