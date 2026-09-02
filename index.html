@@ -430,6 +430,7 @@ async function startApp() {
         populateMonthFilter();
         renderList();
         updateSummary();
+        updateHeaderSub();
         showStatus('✅ מעודכן מהענן', 'success');
         return;
       }
@@ -473,8 +474,9 @@ function saveToStorage() {
 
 function updateHeaderSub() {
   const now = new Date();
+  const monthLabel = now.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
   document.getElementById('headerSub').textContent =
-    now.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' });
+    `${monthLabel} · ${entries.length} רשומות`;
 }
 
 // ---- TABS ----
