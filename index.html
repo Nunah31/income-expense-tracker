@@ -666,7 +666,7 @@ function renderList() {
           onchange="quickSave('${e.id}','paidDate',parseDateIL(this.value))">
       </div>` : '';
 
-    return `<div class="entry-row ${e.type} ${isFullyPaid(e.status)?'is-paid':''}" onclick="openModal('${e.id}')">
+    return `<div class="entry-row ${e.type} ${isFullyPaid(e.status)?'is-paid':''}" onclick="openModal('${e.id}','${e.type}')">
       <div class="entry-main">
         <input type="checkbox" class="entry-check" ${selectedIds.has(e.id)?'checked':''} onclick="event.stopPropagation(); toggleSelect('${e.id}')">
         <div class="entry-name">${e.name||'(ללא שם)'}</div>
@@ -821,7 +821,7 @@ function updateSummary() {
 }
 
 // ---- MODAL ----
-function openModal(id) {
+function openModal(id, forcedType) {
   editingId = id || null;
   const overlay = document.getElementById('modalOverlay');
   overlay.classList.add('open');
@@ -838,7 +838,7 @@ function openModal(id) {
     document.getElementById('fieldStatus').value = e.status || 'unpaid';
     setModalDate('fieldPaidDate','fieldPaidDateDisplay', e.paidDate);
     document.getElementById('fieldNotes').value = e.notes || '';
-    const resolvedType = currentTab !== 'all' ? currentTab : (e.type || 'income');
+    const resolvedType = forcedType || e.type || currentTab || 'income';
     setType(resolvedType);
     if (resolvedType === 'expense') {
       document.getElementById('amountsList').innerHTML = '';
