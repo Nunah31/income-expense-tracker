@@ -642,11 +642,11 @@ function renderList() {
   } else if (sortBy === 'exec_desc') {
     sorted = [...filtered].sort((a, b) => (b.execDate||'').localeCompare(a.execDate||''));
   } else {
-    // ברירת מחדל — הוצאות לפי פרעון מהישן לחדש; שאר לפי ביצוע מהחדש לישן
+    // ברירת מחדל — הוצאות לפי ביצוע מהחדש לישן; שאר לפי ביצוע מהחדש לישן
     sorted = [...filtered].sort((a, b) => {
-      const da = (currentTab === 'expense' ? a.payDate || a.execDate : a.execDate || a.payDate) || '';
-      const db = (currentTab === 'expense' ? b.payDate || b.execDate : b.execDate || b.payDate) || '';
-      return currentTab === 'expense' ? da.localeCompare(db) : db.localeCompare(da);
+      const da = (a.execDate || a.payDate) || '';
+      const db = (b.execDate || b.payDate) || '';
+      return db.localeCompare(da);
     });
   }
 
