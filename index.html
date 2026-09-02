@@ -256,7 +256,7 @@ body { font-family: 'Heebo', 'Arial Hebrew', Arial, sans-serif; background: #f0f
       <h1>💰 הכנסות והוצאות</h1>
       <div class="header-sub" id="headerSub">טוען...</div>
     </div>
-    <div class="header-actions">
+    <div class="header-actions"><button class="btn-sync" onclick="forceLoadFromGithub()" title="טען עדכון מ-GitHub">🔄</button>
       <button class="btn-sync" onclick="openSettings()" title="הגדרות" style="padding:9px 10px;">⚙️</button>
       <button class="btn-add-main" onclick="openModal()">+ הוספה</button>
     </div>
@@ -1326,13 +1326,17 @@ async function forceLoadFromGithub() {
     const bytes = new Uint8Array(bin.length);
     for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
     const data = JSON.parse(new TextDecoder('utf-8').decode(bytes));
-    localStorage.setItem('finance_entries', JSON.stringify(data.entries));
-    localStorage.setItem('finance_savedAt', data.savedAt);
-    alert('נטענו ' + data.entries.length + ' רשומות ✅\nרעני את הדף לצפייה');
-    location.reload();
+    // עדכן ישירות בלי reload
+    entries = data.entries;
+    localStorage.setItem('finance_entries', JSON.stringify(entries));
+    localStorage.setItem('finance_savedAt', new Date().toISOString());
+    populateMonthFilter();
+    renderList();
+    updateSummary();
+    alert('נטענו ' + entries.length + ' רשומות מ-GitHub ✅');
   } catch(e) { alert('שגיאה: ' + e.message); }
 }
 </script>
-<div style="padding:0 0 16px"><button onclick="forceLoadFromGithub()" style="width:100%;padding:12px;background:#1E3A5F;color:white;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit">🔄 טען עדכון מ-GitHub</button><p style="font-size:12px;color:#64748B;text-align:center;margin-top:6px">לחצי כשאפליקציית המופעים שלחה נתונים חדשים</p></div>
+
 </body>
 </html>
