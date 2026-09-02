@@ -40,9 +40,15 @@
       "execDate": "2026-06-18",
       "payDate": "2026-09-15",
       "amount": 767,
-      "notes": "",
+      "subAmounts": [
+        {
+          "value": 767,
+          "note": ""
+        }
+      ],
       "status": "paid_paybox",
-      "paidDate": "2026-08-16"
+      "paidDate": "2026-08-16",
+      "notes": "ח-ן 60469"
     },
     {
       "id": "exp_1782384973577_44",
@@ -51,9 +57,15 @@
       "execDate": "2026-06-16",
       "payDate": "2026-09-15",
       "amount": 600,
-      "notes": "",
+      "subAmounts": [
+        {
+          "value": 600,
+          "note": ""
+        }
+      ],
       "status": "paid_bit",
-      "paidDate": "2026-08-16"
+      "paidDate": "2026-08-16",
+      "notes": "קבלה 35"
     },
     {
       "id": "exp_1782384973568_41",
@@ -89,26 +101,21 @@
       "paidDate": "2026-08-16"
     },
     {
-      "id": "exp_1782371477054_8",
-      "type": "expense",
-      "name": "מנשה",
-      "execDate": "2026-05-06",
-      "payDate": "2026-06-15",
-      "amount": 1437,
-      "notes": "יובלים עמק חפר - שולם לנו ביקשתי חשבונית עסקה ממנשה",
-      "status": "unpaid",
-      "paidDate": ""
-    },
-    {
       "id": "1784704632894",
       "type": "expense",
       "name": "קומסקיור",
       "execDate": "2026-07-28",
       "payDate": "",
       "amount": 9231,
-      "notes": "",
+      "subAmounts": [
+        {
+          "value": 9231,
+          "note": ""
+        }
+      ],
       "status": "unpaid",
-      "paidDate": ""
+      "paidDate": "",
+      "notes": ""
     },
     {
       "id": "exp_1782384973513_9",
@@ -122,26 +129,21 @@
       "paidDate": "2026-08-16"
     },
     {
-      "id": "exp_1782384973538_21",
-      "type": "expense",
-      "name": "גיל",
-      "execDate": "2026-05-06",
-      "payDate": "2026-07-15",
-      "amount": 585,
-      "notes": "ח-ן 50087",
-      "status": "paid_bit",
-      "paidDate": ""
-    },
-    {
       "id": "exp_1782384973590_49",
       "type": "expense",
       "name": "עמית",
       "execDate": "2026-06-18",
-      "payDate": "2026-08-15",
+      "payDate": "2026-09-15",
       "amount": 708,
-      "notes": "",
-      "status": "unpaid",
-      "paidDate": ""
+      "subAmounts": [
+        {
+          "value": 708,
+          "note": ""
+        }
+      ],
+      "status": "paid_paybox",
+      "paidDate": "2026-08-16",
+      "notes": ""
     },
     {
       "id": "1786900203218",
@@ -161,9 +163,15 @@
       "execDate": "2026-06-18",
       "payDate": "2026-09-15",
       "amount": 585,
-      "notes": "",
+      "subAmounts": [
+        {
+          "value": 585,
+          "note": ""
+        }
+      ],
       "status": "paid_paybox",
-      "paidDate": "2026-08-16"
+      "paidDate": "2026-08-16",
+      "notes": "ח-ן 60470"
     },
     {
       "id": "exp_1782371477211_43",
@@ -177,26 +185,21 @@
       "paidDate": ""
     },
     {
-      "id": "exp_1782384973597_52",
-      "type": "expense",
-      "name": "שי ברק",
-      "execDate": "2026-04-23",
-      "payDate": "2026-07-15",
-      "amount": 767,
-      "notes": "ח-ן 60459",
-      "status": "paid_paybox",
-      "paidDate": ""
-    },
-    {
       "id": "exp_1782384973532_17",
       "type": "expense",
       "name": "בוריס",
       "execDate": "2026-06-18",
       "payDate": "2026-09-15",
       "amount": 1770,
-      "notes": "",
+      "subAmounts": [
+        {
+          "value": 1770,
+          "note": ""
+        }
+      ],
       "status": "paid_bit",
-      "paidDate": "2026-08-16"
+      "paidDate": "2026-08-16",
+      "notes": "ח-ן 1131"
     },
     {
       "id": "1700000016",
@@ -238,20 +241,15 @@
       "execDate": "2026-06-16",
       "payDate": "2026-09-15",
       "amount": 1770,
-      "notes": "",
+      "subAmounts": [
+        {
+          "value": 1770,
+          "note": ""
+        }
+      ],
       "status": "paid_bit",
-      "paidDate": "2026-08-16"
-    },
-    {
-      "id": "1784195739597",
-      "type": "income",
-      "name": "קומסקיור",
-      "execDate": "2026-07-16",
-      "payDate": "2026-09-15",
-      "amount": 1975,
-      "notes": "נשלחה חשבונית",
-      "status": "paid",
-      "paidDate": "2026-08-16"
+      "paidDate": "2026-08-16",
+      "notes": "ח-ן 1131"
     },
     {
       "id": "1782648969410",
@@ -263,28 +261,6 @@
       "notes": "",
       "status": "unpaid",
       "paidDate": ""
-    },
-    {
-      "id": "exp_14",
-      "type": "expense",
-      "name": "בוריס",
-      "execDate": "2026-04-27",
-      "payDate": "2026-05-15",
-      "amount": 1770,
-      "notes": "יש חשבונית 1317",
-      "status": "paid_paybox",
-      "paidDate": ""
-    },
-    {
-      "id": "exp_1782384973520_14",
-      "type": "expense",
-      "name": "בוריס",
-      "execDate": "2026-05-06",
-      "payDate": "2026-08-15",
-      "amount": 1770,
-      "notes": "חשבונית 1128",
-      "status": "paid_paybox",
-      "paidDate": "2026-07-16"
     },
     {
       "id": "1786366187715",
@@ -302,11 +278,11 @@
       "type": "expense",
       "name": "עמית",
       "execDate": "2026-06-14",
-      "payDate": "2026-08-15",
+      "payDate": "2026-09-15",
       "amount": 944,
       "notes": "",
-      "status": "unpaid",
-      "paidDate": ""
+      "status": "paid_paybox",
+      "paidDate": "2026-08-16"
     },
     {
       "id": "1786270711742",
@@ -342,17 +318,6 @@
       "paidDate": "2026-08-16"
     },
     {
-      "id": "exp_1782371477186_37",
-      "type": "expense",
-      "name": "מנשה",
-      "execDate": "2026-04-23",
-      "payDate": "2026-08-15",
-      "amount": 1437,
-      "notes": "23.4 - כפר אדומים - שולם לנו ביקשתי ממנשה שישלח ח-ן עסקה ע\"ס 3,237₪ (כפר אדומים וטביב)",
-      "status": "paid_transfer",
-      "paidDate": "2026-07-28"
-    },
-    {
       "id": "exp_1782371477190_38",
       "type": "expense",
       "name": "עמית",
@@ -375,26 +340,16 @@
       "paidDate": "2026-08-16"
     },
     {
-      "id": "exp_1782371477400_79",
-      "type": "expense",
-      "name": "קומסקיור",
-      "execDate": "2026-05-07",
-      "payDate": "2026-08-15",
-      "amount": 1389,
-      "notes": "",
-      "status": "unpaid",
-      "paidDate": ""
-    },
-    {
       "id": "inc_1782371476244_6",
       "type": "income",
       "name": "קרן כספית",
-      "execDate": "2025-12-25",
+      "execDate": "2026-08-31",
       "payDate": "",
-      "amount": 18127,
-      "notes": "",
+      "amount": 18140,
+      "subAmounts": [],
       "status": "unpaid",
-      "paidDate": ""
+      "paidDate": "",
+      "notes": ""
     },
     {
       "id": "1788078204452",
@@ -414,9 +369,15 @@
       "execDate": "2026-06-14",
       "payDate": "2026-09-15",
       "amount": 1300,
-      "notes": "",
+      "subAmounts": [
+        {
+          "value": 1300,
+          "note": ""
+        }
+      ],
       "status": "paid_paybox",
-      "paidDate": "2026-08-18"
+      "paidDate": "2026-08-18",
+      "notes": "ח-ן 1310"
     },
     {
       "id": "1785916610230",
@@ -424,10 +385,24 @@
       "name": "קומסקיור",
       "execDate": "2026-08-02",
       "payDate": "",
-      "amount": 485,
-      "notes": "",
+      "amount": 4698,
+      "subAmounts": [
+        {
+          "value": 485,
+          "note": ""
+        },
+        {
+          "value": 236,
+          "note": "5734"
+        },
+        {
+          "value": 3977,
+          "note": "5959"
+        }
+      ],
       "status": "unpaid",
-      "paidDate": ""
+      "paidDate": "",
+      "notes": ""
     },
     {
       "id": "exp_1782371477181_36",
@@ -438,17 +413,6 @@
       "amount": 0,
       "notes": 500,
       "status": "unpaid",
-      "paidDate": ""
-    },
-    {
-      "id": "exp_1782371477116_22",
-      "type": "expense",
-      "name": "גיל",
-      "execDate": "2026-02-13",
-      "payDate": "2026-07-15",
-      "amount": 944,
-      "notes": "ח-ן 50087",
-      "status": "paid_bit",
       "paidDate": ""
     },
     {
@@ -469,9 +433,62 @@
       "execDate": "2026-06-14",
       "payDate": "2026-09-15",
       "amount": 826,
-      "notes": "",
+      "subAmounts": [
+        {
+          "value": 826,
+          "note": ""
+        }
+      ],
       "status": "paid_paybox",
-      "paidDate": "2026-08-16"
+      "paidDate": "2026-08-16",
+      "notes": "ח-ן 60470"
+    },
+    {
+      "id": "1788186077197",
+      "type": "income",
+      "name": "מקיף ה אשקלון",
+      "execDate": "2026-09-09",
+      "payDate": "2026-09-15",
+      "amount": 0,
+      "subAmounts": [],
+      "status": "paid",
+      "paidDate": "2026-08-31",
+      "notes": "שולם הוצאתי קבלה צריך להוציא חשבונית אחרי המופע"
+    },
+    {
+      "id": "1788186108530",
+      "type": "income",
+      "name": "איתמר נתניה",
+      "execDate": "2026-08-31",
+      "payDate": "2026-09-15",
+      "amount": 0,
+      "subAmounts": [],
+      "status": "paid",
+      "paidDate": "2026-08-31",
+      "notes": "שולם הוצאתי קבלה צריך להוציא חשבונית אחרי המופע"
+    },
+    {
+      "id": "1788336558163",
+      "type": "income",
+      "name": "מרכזים קהילתיים עכו",
+      "execDate": "2026-09-01",
+      "payDate": "",
+      "amount": 26762,
+      "subAmounts": [],
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "נשלחה חשבונית עסקה לפנינה"
+    },
+    {
+      "id": "merkaz_akko_1788338285479",
+      "type": "income",
+      "name": "מרכזים קהילתיים עכו",
+      "execDate": "2026-09-01",
+      "payDate": "",
+      "amount": 26762,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "נשלחה חשבונית עסקה לפנינה"
     },
     {
       "id": "show_29_0_1788185137227",
@@ -538,271 +555,7 @@
       "status": "unpaid",
       "paidDate": "",
       "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_29_0_1788186394673",
-      "type": "expense",
-      "name": "דניאל טהאן",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_29_1_1788186394673",
-      "type": "expense",
-      "name": "ניב רז",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_29_2_1788186394673",
-      "type": "expense",
-      "name": "עמית כהן",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_29_3_1788186394673",
-      "type": "expense",
-      "name": "בוריס – הגברה",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_income_29_1788186394673",
-      "type": "income",
-      "name": "הרצליה מנשה אמיר",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע 30/08/26"
-    },
-    {
-      "id": "show_presenter_29_1788186394673",
-      "type": "expense",
-      "name": "מנשה אמיר",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_32_0_1788276564622",
-      "type": "expense",
-      "name": "בוריס – הגברה",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו 01/09/26"
-    },
-    {
-      "id": "show_32_1_1788276564622",
-      "type": "expense",
-      "name": "עמית כהן",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו 01/09/26"
-    },
-    {
-      "id": "show_32_2_1788276564622",
-      "type": "expense",
-      "name": "סקסופון – עמירם גרנות צפון",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו 01/09/26"
-    },
-    {
-      "id": "show_32_3_1788276564622",
-      "type": "expense",
-      "name": "דניאל טהאן",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו 01/09/26"
-    },
-    {
-      "id": "show_32_4_1788276564622",
-      "type": "expense",
-      "name": "עומרי - גיטרה",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו 01/09/26"
-    },
-    {
-      "id": "show_income_32_1788276564622",
-      "type": "income",
-      "name": "עכו אודימיוזיק",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע 01/09/26"
-    },
-    {
-      "id": "show_38_0_1788276576501",
-      "type": "expense",
-      "name": "בוריס – הגברה",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו העלייה השנייה 01/09/26"
-    },
-    {
-      "id": "show_38_1_1788276576501",
-      "type": "expense",
-      "name": "דניאל טהאן",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו העלייה השנייה 01/09/26"
-    },
-    {
-      "id": "show_38_2_1788276576501",
-      "type": "expense",
-      "name": "עמית כהן",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו העלייה השנייה 01/09/26"
-    },
-    {
-      "id": "show_38_3_1788276576501",
-      "type": "expense",
-      "name": "עומרי - גיטרה",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו העלייה השנייה 01/09/26"
-    },
-    {
-      "id": "show_38_4_1788276576501",
-      "type": "expense",
-      "name": "סקסופון – עמירם גרנות צפון",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע עכו העלייה השנייה 01/09/26"
-    },
-    {
-      "id": "show_income_38_1788276576501",
-      "type": "income",
-      "name": "עכו העלייה השנייה אודימיוזיק",
-      "execDate": "2026-09-01",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע 01/09/26"
-    },
-    {
-      "id": "show_29_0_1788336385559",
-      "type": "expense",
-      "name": "דניאל טהאן",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_29_1_1788336385559",
-      "type": "expense",
-      "name": "ניב רז",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_29_2_1788336385559",
-      "type": "expense",
-      "name": "עמית כהן",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_29_3_1788336385559",
-      "type": "expense",
-      "name": "בוריס – הגברה",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
-    },
-    {
-      "id": "show_income_29_1788336385559",
-      "type": "income",
-      "name": "הרצליה מנשה אמיר",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע 30/08/26"
-    },
-    {
-      "id": "show_presenter_29_1788336385559",
-      "type": "expense",
-      "name": "מנשה אמיר",
-      "execDate": "2026-08-30",
-      "payDate": "",
-      "amount": 0,
-      "status": "unpaid",
-      "paidDate": "",
-      "notes": "מופע הרצליה 30/08/26"
     }
   ],
-  "savedAt": "2026-09-02T08:06:25.559Z"
+  "savedAt": "2026-09-02T08:38:05.479Z"
 }
