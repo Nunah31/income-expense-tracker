@@ -442,7 +442,9 @@ async function startApp() {
     if (remote && remote.entries && remote.savedAt) {
       const localTs = localStorage.getItem('finance_savedAt') || '';
       if (remote.savedAt > localTs) {
-        entries = remote.entries;
+        const localIds = new Set(entries.map(e => e.id));
+        const toAdd = (remote.entries || []).filter(e => !localIds.has(e.id));
+        entries.push(...toAdd);
         if (remote.bankBalance) {
           document.getElementById('bankBalance').value = remote.bankBalance;
           localStorage.setItem('bankBalance', remote.bankBalance);
@@ -1251,7 +1253,9 @@ async function manualSync() {
     const localTs = localStorage.getItem('finance_savedAt') || '';
     if (remote.savedAt > localTs) {
       if (confirm('יש גרסה חדשה יותר מהענן. לטעון אותה?')) {
-        entries = remote.entries;
+        const localIds = new Set(entries.map(e => e.id));
+        const toAdd = (remote.entries || []).filter(e => !localIds.has(e.id));
+        entries.push(...toAdd);
         if (remote.bankBalance) document.getElementById('bankBalance').value = remote.bankBalance;
         saveToStorage();
         populateMonthFilter(); renderList(); updateSummary();
