@@ -710,9 +710,16 @@ function statusOptions(current) {
 }
 
 function next15AfterDate(dateStr) {
-  const d = dateStr ? new Date(dateStr) : new Date();
-  const r = new Date(d.getFullYear(), d.getMonth() + 1, 15);
-  return `${r.getFullYear()}-${String(r.getMonth()+1).padStart(2,'0')}-15`;
+  let y, m;
+  if (dateStr) {
+    [y, m] = dateStr.split('-').map(Number);
+  } else {
+    const d = new Date();
+    y = d.getFullYear(); m = d.getMonth() + 1;
+  }
+  const nextM = m === 12 ? 1 : m + 1;
+  const nextY = m === 12 ? y + 1 : y;
+  return `${nextY}-${String(nextM).padStart(2,'0')}-15`;
 }
 
 function quickSave(id, field, value) {
@@ -916,7 +923,8 @@ function getSubAmounts() {
 }
 
 function todayStr() {
-  return new Date().toISOString().split('T')[0];
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
 
 function syncDateDisplay(nativeId, displayId) {
