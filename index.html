@@ -1343,14 +1343,16 @@ async function forceLoadFromGithub() {
     const bytes = new Uint8Array(bin.length);
     for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
     const data = JSON.parse(new TextDecoder('utf-8').decode(bytes));
-    // עדכן ישירות בלי reload
-    entries = data.entries;
-    localStorage.setItem('finance_entries', JSON.stringify(entries));
-    localStorage.setItem('finance_savedAt', new Date().toISOString());
+    // מיזוג — שומר רשומות מקומיות, מוסיף רק id-ים חדשים מ-GitHub
+    const localIds = new Set(entries.map(e => e.id));
+    const toAdd = (data.entries || []).filter(e => !localIds.has(e.id));
+    entries.push(...toAdd);
+    saveToStorage();
     populateMonthFilter();
     renderList();
     updateSummary();
-    alert('נטענו ' + entries.length + ' רשומות מ-GitHub ✅');
+    updateHeaderSub();
+    alert('נוספו ' + toAdd.length + ' רשומות חדשות מ-GitHub ✅');
   } catch(e) { alert('שגיאה: ' + e.message); }
 }
 </script>
