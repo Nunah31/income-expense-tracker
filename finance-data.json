@@ -611,7 +611,91 @@
       "status": "unpaid",
       "paidDate": "",
       "notes": "מופע בית ספר בגין - נהריה 04/09/26"
+    },
+    {
+      "id": "show_25_0_1789550309998",
+      "show_id": 25,
+      "type": "expense",
+      "name": "עמית כהן",
+      "execDate": "2026-09-09",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע מבצע חורב 6 אשקלון מקיף ה' 09/09/26"
+    },
+    {
+      "id": "show_25_1_1789550309998",
+      "show_id": 25,
+      "type": "expense",
+      "name": "בוריס – הגברה",
+      "execDate": "2026-09-09",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע מבצע חורב 6 אשקלון מקיף ה' 09/09/26"
+    },
+    {
+      "id": "show_25_2_1789550309998",
+      "show_id": 25,
+      "type": "expense",
+      "name": "דניאל טהאן",
+      "execDate": "2026-09-09",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע מבצע חורב 6 אשקלון מקיף ה' 09/09/26"
+    },
+    {
+      "id": "show_25_3_1789550309998",
+      "show_id": 25,
+      "type": "expense",
+      "name": "אריאל סקסופון",
+      "execDate": "2026-09-09",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע מבצע חורב 6 אשקלון מקיף ה' 09/09/26"
+    },
+    {
+      "id": "show_25_4_1789550309998",
+      "show_id": 25,
+      "type": "expense",
+      "name": "עומרי - גיטרה",
+      "execDate": "2026-09-09",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע מבצע חורב 6 אשקלון מקיף ה' 09/09/26"
+    },
+    {
+      "id": "show_income_25_1789550309998",
+      "show_id": 25,
+      "type": "income",
+      "name": "מבצע חורב 6 אשקלון מקיף ה' מנשה אמיר",
+      "execDate": "2026-09-09",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 09/09/26"
+    },
+    {
+      "id": "show_presenter_25_1789550309998",
+      "show_id": 25,
+      "type": "expense",
+      "name": "מנשה אמיר",
+      "execDate": "2026-09-09",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע מבצע חורב 6 אשקלון מקיף ה' 09/09/26"
     }
   ],
-  "savedAt": "2026-09-06T12:57:26.196Z"
+  "savedAt": "2026-09-16T09:18:29.998Z"
 }
