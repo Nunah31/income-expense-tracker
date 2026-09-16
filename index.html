@@ -421,6 +421,7 @@ let entries = [];
 let currentTab = 'income';
 let editingId = null;
 let editingType = 'income';
+let deletedIds = new Set();
 
 // ---- INIT ----
 async function startApp() {
@@ -443,7 +444,7 @@ async function startApp() {
       const localTs = localStorage.getItem('finance_savedAt') || '';
       if (remote.savedAt > localTs) {
         const localIds = new Set(entries.map(e => e.id));
-        const toAdd = (remote.entries || []).filter(e => !localIds.has(e.id));
+        const toAdd = (remote.entries || []).filter(e => !localIds.has(e.id) && !deletedIds.has(e.id));
         entries.push(...toAdd);
         if (remote.bankBalance) {
           document.getElementById('bankBalance').value = remote.bankBalance;
@@ -487,6 +488,15 @@ function loadFromStorage() {
   if (saved) {
     try { entries = JSON.parse(saved); } catch(e) { entries = []; }
   }
+  const del = localStorage.getItem('finance_deleted_ids');
+  if (del) {
+    try { deletedIds = new Set(JSON.parse(del)); } catch(e) { deletedIds = new Set(); }
+  }
+}
+
+function saveDeletedId(id) {
+  deletedIds.add(id);
+  localStorage.setItem('finance_deleted_ids', JSON.stringify([...deletedIds]));
 }
 
 function saveToStorage() {
@@ -599,6 +609,7 @@ function deleteSelected() {
   if (selectedIds.size === 0) return;
   if (!confirm(`למחוק ${selectedIds.size} רשומות נבחרות?`)) return;
   const idsToDelete = [...selectedIds];
+  idsToDelete.forEach(id => saveDeletedId(id));
   entries = entries.filter(e => !selectedIds.has(e.id));
   selectedIds.clear();
   saveToStorage();
@@ -1008,6 +1019,7 @@ function deleteEntry() {
   if (!editingId) return;
   if (!confirm('למחוק את הרשומה?')) return;
   const deletedId = editingId;
+  saveDeletedId(deletedId);
   entries = entries.filter(e => e.id !== deletedId);
   saveToStorage();
   populateMonthFilter();
@@ -1254,7 +1266,7 @@ async function manualSync() {
     if (remote.savedAt > localTs) {
       if (confirm('יש גרסה חדשה יותר מהענן. לטעון אותה?')) {
         const localIds = new Set(entries.map(e => e.id));
-        const toAdd = (remote.entries || []).filter(e => !localIds.has(e.id));
+        const toAdd = (remote.entries || []).filter(e => !localIds.has(e.id) && !deletedIds.has(e.id));
         entries.push(...toAdd);
         if (remote.bankBalance) document.getElementById('bankBalance').value = remote.bankBalance;
         saveToStorage();
@@ -1345,7 +1357,7 @@ async function forceLoadFromGithub() {
     const data = JSON.parse(new TextDecoder('utf-8').decode(bytes));
     // מיזוג — שומר רשומות מקומיות, מוסיף רק id-ים חדשים מ-GitHub
     const localIds = new Set(entries.map(e => e.id));
-    const toAdd = (data.entries || []).filter(e => !localIds.has(e.id));
+    const toAdd = (data.entries || []).filter(e => !localIds.has(e.id) && !deletedIds.has(e.id));
     entries.push(...toAdd);
     saveToStorage();
     populateMonthFilter();
