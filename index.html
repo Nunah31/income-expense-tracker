@@ -613,6 +613,7 @@ function deleteSelected() {
   entries = entries.filter(e => !selectedIds.has(e.id));
   selectedIds.clear();
   saveToStorage();
+  githubSave();
   populateMonthFilter();
   renderList();
   updateSummary();
@@ -1022,6 +1023,7 @@ function deleteEntry() {
   saveDeletedId(deletedId);
   entries = entries.filter(e => e.id !== deletedId);
   saveToStorage();
+  githubSave();
   populateMonthFilter();
   renderList();
   updateSummary();
