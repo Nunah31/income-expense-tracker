@@ -465,6 +465,10 @@ async function startApp() {
 }
 
 function init() {
+  if (new URLSearchParams(location.search).get('reset') === '1') {
+    ['finance_entries','finance_savedAt','finance_deleted_ids'].forEach(k => localStorage.removeItem(k));
+    history.replaceState(null,'',location.pathname);
+  }
   if (sessionStorage.getItem('auth') === '1') {
     afterLogin();
   } else {
