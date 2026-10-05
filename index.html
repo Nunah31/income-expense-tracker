@@ -1350,28 +1350,18 @@ window.addEventListener('pagehide', () => {
 init();
 
 async function forceLoadFromGithub() {
-  const token = localStorage.getItem('gh_token');
-  if (!token) { alert('אין Token מוגדר'); return; }
-  try {
-    const r = await fetch('https://api.github.com/repos/Nunah31/income-expense-tracker/contents/finance-data.json',
-      { headers: { Authorization: 'token ' + token, Accept: 'application/vnd.github.v3+json' }, cache: 'no-store' });
-    if (!r.ok) { alert('שגיאה: ' + r.status); return; }
-    const d = await r.json();
-    const bin = atob(d.content.replace(/\n/g,''));
-    const bytes = new Uint8Array(bin.length);
-    for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
-    const data = JSON.parse(new TextDecoder('utf-8').decode(bytes));
-    // מיזוג — שומר רשומות מקומיות, מוסיף רק id-ים חדשים מ-GitHub
-    const remoteIds3 = new Set((data.entries || []).map(e => e.id));
-    const localOnly3 = entries.filter(e => !remoteIds3.has(e.id) && !deletedIds.has(e.id));
-    entries = [...(data.entries || []), ...localOnly3];
-    saveToStorage();
-    populateMonthFilter();
-    renderList();
-    updateSummary();
-    updateHeaderSub();
-    alert('סנכרון הושלם ✅ (' + entries.length + ' רשומות)');
-  } catch(e) { alert('שגיאה: ' + e.message); }
+  showStatus('☁️ טוען מהענן...', '');
+  const data = await githubLoad();
+  if (!data || !data.entries) { showStatus('❌ שגיאת טעינה', 'error'); return; }
+  const remoteIds = new Set(data.entries.map(e => e.id));
+  const localOnly = entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
+  entries = [...data.entries, ...localOnly];
+  saveToStorage();
+  populateMonthFilter();
+  renderList();
+  updateSummary();
+  updateHeaderSub();
+  showStatus('✅ סנכרון הושלם (' + entries.length + ' רשומות)', 'success');
 }
 </script>
 
