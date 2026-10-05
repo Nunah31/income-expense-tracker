@@ -1366,7 +1366,7 @@ async function forceLoadFromGithub() {
     renderList();
     updateSummary();
     updateHeaderSub();
-    alert('נוספו ' + toAdd.length + ' רשומות חדשות מ-GitHub ✅');
+    alert('סנכרון הושלם ✅ (' + entries.length + ' רשומות)');
   } catch(e) { alert('שגיאה: ' + e.message); }
 }
 </script>
