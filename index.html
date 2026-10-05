@@ -425,8 +425,11 @@ let deletedIds = new Set();
 
 // ---- INIT ----
 async function startApp() {
+  const forceGh = localStorage.getItem('finance_force_gh') === '1';
+  if (forceGh) localStorage.removeItem('finance_force_gh');
+
   loadFromStorage();
-  if (entries.length === 0) {
+  if (!forceGh && entries.length === 0) {
     entries = JSON.parse(JSON.stringify(INITIAL_DATA));
     saveToStorage();
   }
@@ -442,10 +445,10 @@ async function startApp() {
     const remote = await githubLoad();
     if (remote && remote.entries && remote.savedAt) {
       const localTs = localStorage.getItem('finance_savedAt') || '';
-      if (remote.savedAt > localTs) {
+      if (forceGh || remote.savedAt > localTs) {
         const remoteIds = new Set((remote.entries || []).map(e => e.id));
-        const localOnly = entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
-        entries = [...(remote.entries || []), ...localOnly];
+        const localOnly = forceGh ? [] : entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
+        entries = [...remote.entries, ...localOnly];
         if (remote.bankBalance) {
           document.getElementById('bankBalance').value = remote.bankBalance;
           localStorage.setItem('bankBalance', remote.bankBalance);
@@ -467,6 +470,7 @@ async function startApp() {
 function init() {
   if (new URLSearchParams(location.search).get('reset') === '1') {
     ['finance_entries','finance_savedAt','finance_deleted_ids'].forEach(k => localStorage.removeItem(k));
+    localStorage.setItem('finance_force_gh', '1');
     history.replaceState(null,'',location.pathname);
   }
   if (sessionStorage.getItem('auth') === '1') {
