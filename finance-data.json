@@ -613,7 +613,79 @@
       "status": "unpaid",
       "paidDate": "",
       "notes": "מופע 15/09/26"
+    },
+    {
+      "id": "show_37_0_1791187808011",
+      "show_id": 37,
+      "type": "expense",
+      "name": "בוריס – הגברה",
+      "execDate": "2026-09-17",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע חולון 17/09/26"
+    },
+    {
+      "id": "show_37_1_1791187808011",
+      "show_id": 37,
+      "type": "expense",
+      "name": "עמית כהן",
+      "execDate": "2026-09-17",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע חולון 17/09/26"
+    },
+    {
+      "id": "show_37_2_1791187808011",
+      "show_id": 37,
+      "type": "expense",
+      "name": "סקסופון - גיל סמואל",
+      "execDate": "2026-09-17",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע חולון 17/09/26"
+    },
+    {
+      "id": "show_37_3_1791187808011",
+      "show_id": 37,
+      "type": "expense",
+      "name": "שי ברק",
+      "execDate": "2026-09-17",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע חולון 17/09/26"
+    },
+    {
+      "id": "show_37_4_1791187808011",
+      "show_id": 37,
+      "type": "expense",
+      "name": "מני אליהו גיטרה",
+      "execDate": "2026-09-17",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע חולון 17/09/26"
+    },
+    {
+      "id": "show_income_37_1791187808011",
+      "show_id": 37,
+      "type": "income",
+      "name": "חולון שניר",
+      "execDate": "2026-09-17",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 17/09/26"
     }
   ],
-  "savedAt": "2026-09-16T09:47:15.813Z"
+  "savedAt": "2026-10-05T08:10:08.011Z"
 }
