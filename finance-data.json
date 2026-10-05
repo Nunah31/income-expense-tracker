@@ -685,7 +685,31 @@
       "status": "unpaid",
       "paidDate": "",
       "notes": "מופע 17/09/26"
+    },
+    {
+      "id": "show_31_0_1791187822670",
+      "show_id": 31,
+      "type": "expense",
+      "name": "דניאל טהאן",
+      "execDate": "2026-09-16",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע רשי 5 רמת גן 16/09/26"
+    },
+    {
+      "id": "show_income_31_1791187822670",
+      "show_id": 31,
+      "type": "income",
+      "name": "רשי 5 רמת גן אודימיוזיק",
+      "execDate": "2026-09-16",
+      "payDate": "",
+      "amount": 0,
+      "status": "unpaid",
+      "paidDate": "",
+      "notes": "מופע 16/09/26"
     }
   ],
-  "savedAt": "2026-10-05T08:10:08.011Z"
+  "savedAt": "2026-10-05T08:10:22.670Z"
 }
