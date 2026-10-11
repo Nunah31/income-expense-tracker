@@ -446,9 +446,11 @@ async function startApp() {
     if (remote && remote.entries && remote.savedAt) {
       const localTs = localStorage.getItem('finance_savedAt') || '';
       if (forceGh || remote.savedAt > localTs) {
-        const remoteIds = new Set((remote.entries || []).map(e => e.id));
+        const filteredRemote = (remote.entries || []).filter(e => !deletedIds.has(e.id));
+        const remoteIds = new Set(filteredRemote.map(e => e.id));
         const localOnly = forceGh ? [] : entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
-        entries = [...remote.entries, ...localOnly];
+        entries = [...filteredRemote, ...localOnly];
+        if (filteredRemote.length < (remote.entries || []).length) githubSave();
         if (remote.bankBalance) {
           document.getElementById('bankBalance').value = remote.bankBalance;
           localStorage.setItem('bankBalance', remote.bankBalance);
@@ -1275,9 +1277,11 @@ async function manualSync() {
     const localTs = localStorage.getItem('finance_savedAt') || '';
     if (remote.savedAt > localTs) {
       if (confirm('יש גרסה חדשה יותר מהענן. לטעון אותה?')) {
-        const remoteIds2 = new Set((remote.entries || []).map(e => e.id));
+        const filteredRemote2 = (remote.entries || []).filter(e => !deletedIds.has(e.id));
+        const remoteIds2 = new Set(filteredRemote2.map(e => e.id));
         const localOnly2 = entries.filter(e => !remoteIds2.has(e.id) && !deletedIds.has(e.id));
-        entries = [...(remote.entries || []), ...localOnly2];
+        entries = [...filteredRemote2, ...localOnly2];
+        if (filteredRemote2.length < (remote.entries || []).length) githubSave();
         if (remote.bankBalance) document.getElementById('bankBalance').value = remote.bankBalance;
         saveToStorage();
         populateMonthFilter(); renderList(); updateSummary();
@@ -1357,10 +1361,12 @@ async function forceLoadFromGithub() {
   showStatus('☁️ טוען מהענן...', '');
   const data = await githubLoad();
   if (!data || !data.entries) { showStatus('❌ שגיאת טעינה', 'error'); return; }
-  const remoteIds = new Set(data.entries.map(e => e.id));
-  const localOnly = entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
-  entries = [...data.entries, ...localOnly];
+  const filteredRemote3 = data.entries.filter(e => !deletedIds.has(e.id));
+  const remoteIds3 = new Set(filteredRemote3.map(e => e.id));
+  const localOnly3 = entries.filter(e => !remoteIds3.has(e.id) && !deletedIds.has(e.id));
+  entries = [...filteredRemote3, ...localOnly3];
   saveToStorage();
+  if (filteredRemote3.length < data.entries.length) githubSave();
   populateMonthFilter();
   renderList();
   updateSummary();
