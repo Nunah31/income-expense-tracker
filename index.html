@@ -451,7 +451,8 @@ async function startApp() {
         const localOnly = forceGh ? [] : entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
         entries = [...filteredRemote, ...localOnly];
         if (filteredRemote.length < (remote.entries || []).length) githubSave();
-        if (remote.bankBalance) {
+        const localBal = localStorage.getItem('bankBalance') || '';
+        if (remote.bankBalance && !localBal) {
           document.getElementById('bankBalance').value = remote.bankBalance;
           localStorage.setItem('bankBalance', remote.bankBalance);
         }
@@ -1282,7 +1283,7 @@ async function manualSync() {
         const localOnly2 = entries.filter(e => !remoteIds2.has(e.id) && !deletedIds.has(e.id));
         entries = [...filteredRemote2, ...localOnly2];
         if (filteredRemote2.length < (remote.entries || []).length) githubSave();
-        if (remote.bankBalance) document.getElementById('bankBalance').value = remote.bankBalance;
+        if (remote.bankBalance && !(localStorage.getItem('bankBalance'))) document.getElementById('bankBalance').value = remote.bankBalance;
         saveToStorage();
         populateMonthFilter(); renderList(); updateSummary();
         showStatus('✅ נטען מהענן', 'success');
