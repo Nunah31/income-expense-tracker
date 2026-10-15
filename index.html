@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v12 -->
+<!DOCTYPE html><!-- v13 -->
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -1244,10 +1244,10 @@ async function githubSave() {
           remote.deletedIds.forEach(id => deletedIds.add(id));
           localStorage.setItem('finance_deleted_ids', JSON.stringify([...deletedIds]));
         }
-        const filteredRemote = (remote.entries || []).filter(e => !deletedIds.has(e.id));
-        const remoteIds = new Set(filteredRemote.map(e => e.id));
-        const localOnly = entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
-        entries = [...filteredRemote, ...localOnly];
+        const localIds = new Set(entries.map(e => e.id));
+        const remoteOnly = (remote.entries || []).filter(e => !localIds.has(e.id) && !deletedIds.has(e.id));
+        const filteredLocal = entries.filter(e => !deletedIds.has(e.id));
+        entries = [...filteredLocal, ...remoteOnly];
         localStorage.setItem('finance_entries', JSON.stringify(entries));
       } catch(e) {}
     }
