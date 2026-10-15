@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v9 -->
+<!DOCTYPE html><!-- v12 -->
 <html lang="he" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -446,6 +446,10 @@ async function startApp() {
     if (remote && remote.entries && remote.savedAt) {
       const localTs = localStorage.getItem('finance_savedAt') || '';
       if (forceGh || remote.savedAt > localTs) {
+        if (remote.deletedIds && remote.deletedIds.length) {
+          remote.deletedIds.forEach(id => deletedIds.add(id));
+          localStorage.setItem('finance_deleted_ids', JSON.stringify([...deletedIds]));
+        }
         const filteredRemote = (remote.entries || []).filter(e => !deletedIds.has(e.id));
         const remoteIds = new Set(filteredRemote.map(e => e.id));
         const localOnly = forceGh ? [] : entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
@@ -485,12 +489,10 @@ function init() {
 }
 
 function afterLogin() {
-  // אם טוקן לא הוגדר עדיין — הצג מסך הגדרה
   if (localStorage.getItem('gh_token') === null) {
-    document.getElementById('ghSetup').style.display = 'flex';
-  } else {
-    startApp();
+    localStorage.setItem('gh_token', '');
   }
+  startApp();
 }
 
 function loadFromStorage() {
@@ -1227,20 +1229,37 @@ async function githubSave() {
   const token = ghToken();
   if (!token) return false;
   try {
-    const payload = JSON.stringify({
-      entries,
-      bankBalance: document.getElementById('bankBalance').value || '',
-      savedAt: new Date().toISOString(),
-    });
-    const content = btoa(unescape(encodeURIComponent(payload)));
-
-    // קבל SHA נוכחי
+    // קרא GitHub קודם — מזג לפני שמירה כדי לא לדרוס שינויים של הצד השני
     let sha;
     const getR = await fetch(`https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`, {
       headers: { 'Authorization': `token ${token}`, 'Accept': 'application/vnd.github.v3+json' }
     });
-    if (getR.ok) { const f = await getR.json(); sha = f.sha; }
+    if (getR.ok) {
+      const f = await getR.json();
+      sha = f.sha;
+      try {
+        const remoteText = decodeURIComponent(escape(atob(f.content.replace(/\n/g, ''))));
+        const remote = JSON.parse(remoteText);
+        if (remote.deletedIds) {
+          remote.deletedIds.forEach(id => deletedIds.add(id));
+          localStorage.setItem('finance_deleted_ids', JSON.stringify([...deletedIds]));
+        }
+        const filteredRemote = (remote.entries || []).filter(e => !deletedIds.has(e.id));
+        const remoteIds = new Set(filteredRemote.map(e => e.id));
+        const localOnly = entries.filter(e => !remoteIds.has(e.id) && !deletedIds.has(e.id));
+        entries = [...filteredRemote, ...localOnly];
+        localStorage.setItem('finance_entries', JSON.stringify(entries));
+      } catch(e) {}
+    }
 
+    const savedAt = new Date().toISOString();
+    const payload = JSON.stringify({
+      entries,
+      bankBalance: document.getElementById('bankBalance').value || '',
+      savedAt,
+      deletedIds: [...deletedIds],
+    });
+    const content = btoa(unescape(encodeURIComponent(payload)));
     const body = { message: 'sync', content };
     if (sha) body.sha = sha;
 
@@ -1253,6 +1272,7 @@ async function githubSave() {
       },
       body: JSON.stringify(body),
     });
+    if (putR.ok) localStorage.setItem('finance_savedAt', savedAt);
     return putR.ok;
   } catch { return false; }
 }
